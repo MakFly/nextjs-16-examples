@@ -385,6 +385,7 @@ function SimpleChatExample() {
 
 // Todo List with Optimistic Updates
 function OptimisticTodoList() {
+  const t = useTranslations('useOptimistic');
   const [todos, setTodos] = useState<Todo[]>([
     { id: '1', text: 'Apprendre useOptimistic', completed: false },
     { id: '2', text: 'Créer une todo app', completed: true },
@@ -555,6 +556,7 @@ function OptimisticTodoList() {
 
 // Complex Form with Optimistic Updates
 function OptimisticPostForm() {
+  const t = useTranslations('useOptimistic');
   const [posts, setPosts] = useState<Post[]>([
     {
       id: '1',
@@ -756,6 +758,8 @@ function OptimisticPostForm() {
 }
 
 export default function UseOptimisticPage() {
+  const t = useTranslations('useOptimistic');
+  
   return (
     <div className="min-h-screen">
       {/* Header */}

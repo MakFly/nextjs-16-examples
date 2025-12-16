@@ -974,6 +974,8 @@ function ProjectForm() {
 // PAGE PRINCIPALE
 // ============================================
 export default function ReactHookFormPage() {
+  const t = useTranslations('reactHookForm');
+  
   return (
     <div className="min-h-screen">
       {/* Header */}

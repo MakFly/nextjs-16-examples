@@ -135,7 +135,19 @@ async function SimpleServerData() {
 }
 
 // Server Component - Complex Data with Multiple Sources
-async function ComplexServerData() {
+async function ComplexServerData({ 
+  usersLabel, 
+  growthLabel, 
+  vsLastMonth, 
+  activeTodayLabel, 
+  onlineUsers 
+}: {
+  usersLabel: string;
+  growthLabel: string;
+  vsLastMonth: string;
+  activeTodayLabel: string;
+  onlineUsers: string;
+}) {
   // Simulate multiple API calls
   const [users, stats, trends] = await Promise.all([
     fetch('https://jsonplaceholder.typicode.com/users').then(res => res.json()).catch(() => []),
@@ -158,7 +170,7 @@ async function ComplexServerData() {
         <CardHeader className="pb-3">
           <CardTitle className="text-sm flex items-center">
             <Users className="h-4 w-4 mr-2" />
-            {t('users')}
+            {usersLabel}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -173,12 +185,12 @@ async function ComplexServerData() {
         <CardHeader className="pb-3">
           <CardTitle className="text-sm flex items-center">
             <TrendingUp className="h-4 w-4 mr-2" />
-            {t('growth')}
+            {growthLabel}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold text-green-600">{(stats as any).growth}</div>
-          <p className="text-xs text-muted-foreground">{t('vsLastMonth')}</p>
+          <p className="text-xs text-muted-foreground">{vsLastMonth}</p>
         </CardContent>
       </Card>
       
@@ -186,12 +198,12 @@ async function ComplexServerData() {
         <CardHeader className="pb-3">
           <CardTitle className="text-sm flex items-center">
             <Clock className="h-4 w-4 mr-2" />
-            {t('activeToday')}
+            {activeTodayLabel}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{(stats as any).activeToday}</div>
-          <p className="text-xs text-muted-foreground">{t('onlineUsers')}</p>
+          <p className="text-xs text-muted-foreground">{onlineUsers}</p>
         </CardContent>
       </Card>
     </div>
@@ -439,7 +451,13 @@ export default function Page() {
                   {[1, 2, 3].map(i => <LoadingCard key={i} />)}
                 </div>
               }>
-                <ComplexServerData />
+                <ComplexServerData 
+                  usersLabel={t('users')}
+                  growthLabel={t('growth')}
+                  vsLastMonth={t('vsLastMonth')}
+                  activeTodayLabel={t('activeToday')}
+                  onlineUsers={t('onlineUsers')}
+                />
               </Suspense>
 
               <CodeExample

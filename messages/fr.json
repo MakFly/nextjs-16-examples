@@ -825,7 +825,8 @@
     "exploreCollection": "Explorez la collection complète d'exemples avec du code source détaillé et des explications pas à pas.",
     "accessExamples": "Accéder aux exemples",
     "advancedPatterns": "Patterns Avancés",
-    "advancedPatternsDesc": "Techniques avancées pour optimiser vos applications Next.js"
+    "advancedPatternsDesc": "Techniques avancées pour optimiser vos applications Next.js",
+    "features": "Fonctionnalités"
   },
   "metadata": {
     "title": "Tutoriels Next.js 16",
