@@ -15,6 +15,7 @@ import { CodeExample } from '@/components/code-example';
 import { Badge } from '@/components/ui/badge';
 import { WhyWhenTabs } from '@/components/why-when-tabs';
 import { Separator } from '@/components/ui/separator';
+import { Label } from '@/components/ui/label';
 import {
   Form,
   FormControl,
@@ -830,7 +831,7 @@ function ProjectForm() {
         {/* Features dynamiques avec useFieldArray */}
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <FormLabel>{t('featuresToImplement')}</FormLabel>
+            <Label className="text-base font-semibold">{t('featuresToImplement')}</Label>
             <Button
               type="button"
               variant="outline"
@@ -903,7 +904,7 @@ function ProjectForm() {
 
         {/* Options */}
         <div className="space-y-4">
-          <FormLabel>{t('options')}</FormLabel>
+          <Label className="text-base font-semibold">{t('options')}</Label>
 
           <FormField
             control={form.control}

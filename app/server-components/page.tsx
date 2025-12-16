@@ -14,9 +14,11 @@ import {
   Clock,
   Users,
   TrendingUp,
-  Loader2,
   HelpCircle
 } from 'lucide-react';
+import { SimpleServerData } from './simple-server-data';
+import { ComplexServerData } from './complex-server-data';
+import { LoadingCard } from './loading-card';
 
 const serverComponentsWhyWhen = {
   why: {
@@ -116,113 +118,6 @@ const serverComponentsWhyWhen = {
   }
 };
 
-// Server Component - Simple Data Fetching
-async function SimpleServerData() {
-  // Simulate API call
-  await new Promise(resolve => setTimeout(resolve, 1000));
-  const data = {
-    timestamp: new Date().toISOString(),
-    message: "This data was fetched on the server!"
-  };
-  
-  return (
-    <div className="p-4 bg-green-50 dark:bg-green-950 rounded-lg border border-green-200 dark:border-green-800">
-      <h3 className="font-semibold text-green-800 dark:text-green-200 mb-2">Server-side Data</h3>
-      <p className="text-sm text-green-700 dark:text-green-300">Fetched at: {data.timestamp}</p>
-      <p className="text-green-600 dark:text-green-400">{data.message}</p>
-    </div>
-  );
-}
-
-// Server Component - Complex Data with Multiple Sources
-async function ComplexServerData({ 
-  usersLabel, 
-  growthLabel, 
-  vsLastMonth, 
-  activeTodayLabel, 
-  onlineUsers 
-}: {
-  usersLabel: string;
-  growthLabel: string;
-  vsLastMonth: string;
-  activeTodayLabel: string;
-  onlineUsers: string;
-}) {
-  // Simulate multiple API calls
-  const [users, stats, trends] = await Promise.all([
-    fetch('https://jsonplaceholder.typicode.com/users').then(res => res.json()).catch(() => []),
-    new Promise(resolve => setTimeout(() => resolve({
-      totalUsers: 1234,
-      activeToday: 89,
-      growth: '+12%'
-    }), 800)),
-    new Promise(resolve => setTimeout(() => resolve([
-      { month: 'Jan', value: 400 },
-      { month: 'Feb', value: 300 },
-      { month: 'Mar', value: 600 },
-      { month: 'Apr', value: 800 },
-    ]), 1200))
-  ]);
-
-  return (
-    <div className="grid md:grid-cols-3 gap-4">
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm flex items-center">
-            <Users className="h-4 w-4 mr-2" />
-            {usersLabel}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{(stats as any).totalUsers}</div>
-          <p className="text-xs text-muted-foreground">
-            {users.slice(0, 3).map((user: any) => user.name).join(', ')}...
-          </p>
-        </CardContent>
-      </Card>
-      
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm flex items-center">
-            <TrendingUp className="h-4 w-4 mr-2" />
-            {growthLabel}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold text-green-600">{(stats as any).growth}</div>
-          <p className="text-xs text-muted-foreground">{vsLastMonth}</p>
-        </CardContent>
-      </Card>
-      
-      <Card>
-        <CardHeader className="pb-3">
-          <CardTitle className="text-sm flex items-center">
-            <Clock className="h-4 w-4 mr-2" />
-            {activeTodayLabel}
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{(stats as any).activeToday}</div>
-          <p className="text-xs text-muted-foreground">{onlineUsers}</p>
-        </CardContent>
-      </Card>
-    </div>
-  );
-}
-
-// Loading Component
-function LoadingCard() {
-  // Note: This is a client component, but we can't use translations here
-  // as it's used in Suspense fallback. We'll keep it simple.
-  return (
-    <div className="p-4 border rounded-lg">
-      <div className="flex items-center space-x-2">
-        <Loader2 className="h-4 w-4 animate-spin" />
-        <span className="text-sm text-muted-foreground">Loading server data...</span>
-      </div>
-    </div>
-  );
-}
 
 export default function ServerComponentsPage() {
   const t = useTranslations('serverComponents');
