@@ -88,6 +88,10 @@ import {
   HelpCircle,
   X,
   Save,
+  CheckSquare,
+  UserX,
+  UserCheck,
+  FileDown,
 } from 'lucide-react';
 
 const tanstackTableWhyWhen = {
@@ -541,6 +545,68 @@ function UserDeleteDialog({ user, open, onOpenChange, onConfirm }: UserDeleteDia
   );
 }
 
+// Alert Dialog pour suppression en masse
+interface BulkDeleteDialogProps {
+  users: User[];
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onConfirm: (users: User[]) => void;
+}
+
+function BulkDeleteDialog({ users, open, onOpenChange, onConfirm }: BulkDeleteDialogProps) {
+  if (users.length === 0) return null;
+
+  return (
+    <AlertDialog open={open} onOpenChange={onOpenChange}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle className="flex items-center gap-2 text-destructive">
+            <Trash2 className="h-5 w-5" />
+            Suppression en masse
+          </AlertDialogTitle>
+          <AlertDialogDescription className="space-y-3">
+            <p>
+              Êtes-vous sûr de vouloir supprimer{' '}
+              <span className="font-semibold text-foreground">{users.length} utilisateur{users.length > 1 ? 's' : ''}</span> ?
+            </p>
+            <div className="max-h-32 overflow-y-auto rounded-md border bg-muted/50 p-2">
+              <ul className="text-sm space-y-1">
+                {users.slice(0, 5).map((user) => (
+                  <li key={user.id} className="flex items-center gap-2">
+                    <UserX className="h-3 w-3 text-destructive" />
+                    {user.firstName} {user.lastName}
+                  </li>
+                ))}
+                {users.length > 5 && (
+                  <li className="text-muted-foreground italic">
+                    ... et {users.length - 5} autre{users.length - 5 > 1 ? 's' : ''}
+                  </li>
+                )}
+              </ul>
+            </div>
+            <p className="text-sm text-destructive font-medium">
+              Cette action est irréversible.
+            </p>
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Annuler</AlertDialogCancel>
+          <AlertDialogAction
+            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            onClick={() => {
+              onConfirm(users);
+              toast.error(`${users.length} utilisateur${users.length > 1 ? 's' : ''} supprimé${users.length > 1 ? 's' : ''}`);
+            }}
+          >
+            <Trash2 className="mr-2 h-4 w-4" />
+            Supprimer {users.length} utilisateur{users.length > 1 ? 's' : ''}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+}
+
 // Table basique
 function BasicTable() {
   const t = useTranslations('tanstackTable');
@@ -801,6 +867,9 @@ function AdvancedTable() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [dialogMode, setDialogMode] = useState<'view' | 'edit'>('view');
 
+  // Bulk action states
+  const [bulkDeleteDialogOpen, setBulkDeleteDialogOpen] = useState(false);
+
   const handleView = (user: User) => {
     setSelectedUser(user);
     setDialogMode('view');
@@ -824,6 +893,52 @@ function AdvancedTable() {
 
   const handleConfirmDelete = (user: User) => {
     setData(prev => prev.filter(u => u.id !== user.id));
+  };
+
+  // Bulk action handlers
+  const getSelectedUsers = (table: ReturnType<typeof useReactTable<User>>) => {
+    return table.getFilteredSelectedRowModel().rows.map(row => row.original);
+  };
+
+  const handleBulkDelete = (users: User[]) => {
+    const userIds = new Set(users.map(u => u.id));
+    setData(prev => prev.filter(u => !userIds.has(u.id)));
+    setRowSelection({});
+  };
+
+  const handleBulkStatusChange = (table: ReturnType<typeof useReactTable<User>>, status: User['status']) => {
+    const selectedUsers = getSelectedUsers(table);
+    const userIds = new Set(selectedUsers.map(u => u.id));
+    setData(prev => prev.map(u => userIds.has(u.id) ? { ...u, status } : u));
+    setRowSelection({});
+    toast.success(`${selectedUsers.length} utilisateur${selectedUsers.length > 1 ? 's' : ''} mis à jour en "${status === 'active' ? 'Actif' : status === 'inactive' ? 'Inactif' : 'En attente'}"`);
+  };
+
+  const handleBulkExport = (table: ReturnType<typeof useReactTable<User>>) => {
+    const selectedUsers = getSelectedUsers(table);
+    const csvContent = [
+      ['ID', 'Prénom', 'Nom', 'Email', 'Entreprise', 'Département', 'Rôle', 'Statut', 'Salaire'].join(','),
+      ...selectedUsers.map(u => [
+        u.id,
+        u.firstName,
+        u.lastName,
+        u.email,
+        u.company,
+        u.department,
+        u.role,
+        u.status,
+        u.salary
+      ].join(','))
+    ].join('\n');
+
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `utilisateurs-selection-${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    window.URL.revokeObjectURL(url);
+    toast.success(`${selectedUsers.length} utilisateur${selectedUsers.length > 1 ? 's' : ''} exporté${selectedUsers.length > 1 ? 's' : ''} en CSV`);
   };
 
   const columns = useMemo<ColumnDef<User>[]>(
@@ -1017,8 +1132,76 @@ function AdvancedTable() {
     },
   });
 
+  const selectedCount = table.getFilteredSelectedRowModel().rows.length;
+
   return (
     <div className="space-y-4">
+      {/* Barre d'actions de masse - apparaît quand des éléments sont sélectionnés */}
+      {selectedCount > 0 && (
+        <div className="flex items-center justify-between gap-4 rounded-lg border border-primary/20 bg-primary/5 p-3">
+          <div className="flex items-center gap-2">
+            <CheckSquare className="h-5 w-5 text-primary" />
+            <span className="font-medium text-primary">
+              {selectedCount} utilisateur{selectedCount > 1 ? 's' : ''} sélectionné{selectedCount > 1 ? 's' : ''}
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            {/* Changer le statut */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="sm">
+                  <UserCheck className="mr-2 h-4 w-4" />
+                  Changer statut
+                  <ChevronDown className="ml-2 h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuLabel>Nouveau statut</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => handleBulkStatusChange(table, 'active')}>
+                  <Badge variant="default" className="mr-2">Actif</Badge>
+                  Marquer comme actif
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleBulkStatusChange(table, 'pending')}>
+                  <Badge variant="secondary" className="mr-2">En attente</Badge>
+                  Marquer en attente
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => handleBulkStatusChange(table, 'inactive')}>
+                  <Badge variant="destructive" className="mr-2">Inactif</Badge>
+                  Marquer comme inactif
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {/* Exporter la sélection */}
+            <Button variant="outline" size="sm" onClick={() => handleBulkExport(table)}>
+              <FileDown className="mr-2 h-4 w-4" />
+              Exporter CSV
+            </Button>
+
+            {/* Supprimer la sélection */}
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={() => setBulkDeleteDialogOpen(true)}
+            >
+              <Trash2 className="mr-2 h-4 w-4" />
+              Supprimer
+            </Button>
+
+            {/* Désélectionner tout */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setRowSelection({})}
+            >
+              <X className="mr-2 h-4 w-4" />
+              Annuler
+            </Button>
+          </div>
+        </div>
+      )}
+
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-2">
           <Search className="h-4 w-4 text-gray-400" />
@@ -1187,6 +1370,12 @@ function AdvancedTable() {
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
         onConfirm={handleConfirmDelete}
+      />
+      <BulkDeleteDialog
+        users={getSelectedUsers(table)}
+        open={bulkDeleteDialogOpen}
+        onOpenChange={setBulkDeleteDialogOpen}
+        onConfirm={handleBulkDelete}
       />
     </div>
   );
