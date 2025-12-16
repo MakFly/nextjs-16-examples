@@ -1,7 +1,12 @@
 // Server Component - Simple Data Fetching
 export async function SimpleServerData() {
-  // Simulate API call
-  await new Promise(resolve => setTimeout(resolve, 1000));
+  // Simulate API call with a real fetch (works in production)
+  const response = await fetch('https://jsonplaceholder.typicode.com/posts/1', {
+    cache: 'no-store', // Force fresh data on each request
+    next: { revalidate: 0 }
+  });
+  await response.json(); // Wait for the fetch to complete
+  
   const data = {
     timestamp: new Date().toISOString(),
     message: "This data was fetched on the server!"

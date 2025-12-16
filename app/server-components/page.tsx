@@ -1,6 +1,5 @@
 'use client';
 
-import { Suspense } from 'react';
 import { useTranslations } from 'next-intl';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -16,9 +15,7 @@ import {
   TrendingUp,
   HelpCircle
 } from 'lucide-react';
-import { SimpleServerData } from './simple-server-data';
-import { ComplexServerData } from './complex-server-data';
-import { LoadingCard } from './loading-card';
+import { SimpleServerDataWrapper, ComplexServerDataWrapper } from './server-data-wrapper';
 
 const serverComponentsWhyWhen = {
   why: {
@@ -294,9 +291,7 @@ export default function ClientComponent() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <Suspense fallback={<LoadingCard />}>
-                <SimpleServerData />
-              </Suspense>
+              <SimpleServerDataWrapper />
 
               <CodeExample
                 title="Simple Server Component"
@@ -341,19 +336,13 @@ export default function Page() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              <Suspense fallback={
-                <div className="grid md:grid-cols-3 gap-4">
-                  {[1, 2, 3].map(i => <LoadingCard key={i} />)}
-                </div>
-              }>
-                <ComplexServerData 
-                  usersLabel={t('users')}
-                  growthLabel={t('growth')}
-                  vsLastMonth={t('vsLastMonth')}
-                  activeTodayLabel={t('activeToday')}
-                  onlineUsers={t('onlineUsers')}
-                />
-              </Suspense>
+              <ComplexServerDataWrapper
+                usersLabel={t('users')}
+                growthLabel={t('growth')}
+                vsLastMonth={t('vsLastMonth')}
+                activeTodayLabel={t('activeToday')}
+                onlineUsers={t('onlineUsers')}
+              />
 
               <CodeExample
                 title="Complex Server Component with Multiple Data Sources"

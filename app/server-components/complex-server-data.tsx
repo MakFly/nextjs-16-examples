@@ -15,20 +15,29 @@ export async function ComplexServerData({
   activeTodayLabel: string;
   onlineUsers: string;
 }) {
-  // Simulate multiple API calls
+  // Simulate multiple API calls with real fetches (works in production)
   const [users, stats, trends] = await Promise.all([
-    fetch('https://jsonplaceholder.typicode.com/users').then(res => res.json()).catch(() => []),
-    new Promise(resolve => setTimeout(() => resolve({
+    fetch('https://jsonplaceholder.typicode.com/users', {
+      cache: 'no-store',
+      next: { revalidate: 0 }
+    }).then(res => res.json()).catch(() => []),
+    fetch('https://jsonplaceholder.typicode.com/posts/1', {
+      cache: 'no-store',
+      next: { revalidate: 0 }
+    }).then(() => ({
       totalUsers: 1234,
       activeToday: 89,
       growth: '+12%'
-    }), 800)),
-    new Promise(resolve => setTimeout(() => resolve([
+    })),
+    fetch('https://jsonplaceholder.typicode.com/posts/2', {
+      cache: 'no-store',
+      next: { revalidate: 0 }
+    }).then(() => [
       { month: 'Jan', value: 400 },
       { month: 'Feb', value: 300 },
       { month: 'Mar', value: 600 },
       { month: 'Apr', value: 800 },
-    ]), 1200))
+    ])
   ]);
 
   return (
