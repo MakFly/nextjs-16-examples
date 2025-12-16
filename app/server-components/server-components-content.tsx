@@ -3,6 +3,8 @@ import { SimpleServerData } from './simple-server-data';
 import { ComplexServerData } from './complex-server-data';
 import { LoadingCard } from './loading-card';
 
+// Server Component that wraps the Server Components
+// This can be imported by Client Components because it's passed as children/props
 export function SimpleServerDataWrapper() {
   return (
     <Suspense fallback={<LoadingCard />}>

@@ -47,6 +47,24 @@ import {
 } from '@/components/ui/table';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import {
   ArrowUpDown,
   ChevronDown,
   ChevronRight,
@@ -68,6 +86,8 @@ import {
   TrendingUp,
   TrendingDown,
   HelpCircle,
+  X,
+  Save,
 } from 'lucide-react';
 
 const tanstackTableWhyWhen = {
@@ -224,7 +244,7 @@ const generateSales = (): Sale[] => {
   const regions = ['North', 'South', 'East', 'West', 'Central'];
   const salespeople = ['Alice Johnson', 'Bob Smith', 'Charlie Brown', 'Diana Prince', 'Eve Adams'];
   const statuses: Sale['status'][] = ['completed', 'pending', 'cancelled'];
-  
+
   return Array.from({ length: 100 }, (_, i) => ({
     id: `sale-${i + 1}`,
     product: products[i % products.length],
@@ -237,13 +257,328 @@ const generateSales = (): Sale[] => {
   }));
 };
 
+// Dialog pour voir/éditer un utilisateur
+interface UserViewEditDialogProps {
+  user: User | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  mode: 'view' | 'edit';
+  onSave?: (user: User) => void;
+}
+
+function UserViewEditDialog({ user, open, onOpenChange, mode, onSave }: UserViewEditDialogProps) {
+  const [editedUser, setEditedUser] = useState<User | null>(null);
+  const [isEditing, setIsEditing] = useState(mode === 'edit');
+
+  React.useEffect(() => {
+    if (user) {
+      setEditedUser({ ...user });
+      setIsEditing(mode === 'edit');
+    }
+  }, [user, mode]);
+
+  const handleSave = () => {
+    if (editedUser && onSave) {
+      onSave(editedUser);
+      toast.success(`Utilisateur ${editedUser.firstName} ${editedUser.lastName} modifié avec succès`);
+      onOpenChange(false);
+    }
+  };
+
+  if (!user || !editedUser) return null;
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-[500px]">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-3">
+            <Avatar className="h-10 w-10">
+              <AvatarImage src={user.avatar} alt={user.firstName} />
+              <AvatarFallback>{user.firstName[0]}{user.lastName[0]}</AvatarFallback>
+            </Avatar>
+            {isEditing ? 'Modifier l\'utilisateur' : 'Détails de l\'utilisateur'}
+          </DialogTitle>
+          <DialogDescription>
+            {isEditing
+              ? 'Modifiez les informations de l\'utilisateur ci-dessous.'
+              : `Informations complètes de ${user.firstName} ${user.lastName}`
+            }
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="grid gap-4 py-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="firstName">Prénom</Label>
+              {isEditing ? (
+                <Input
+                  id="firstName"
+                  value={editedUser.firstName}
+                  onChange={(e) => setEditedUser({ ...editedUser, firstName: e.target.value })}
+                />
+              ) : (
+                <p className="text-sm font-medium py-2">{user.firstName}</p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="lastName">Nom</Label>
+              {isEditing ? (
+                <Input
+                  id="lastName"
+                  value={editedUser.lastName}
+                  onChange={(e) => setEditedUser({ ...editedUser, lastName: e.target.value })}
+                />
+              ) : (
+                <p className="text-sm font-medium py-2">{user.lastName}</p>
+              )}
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="email">Email</Label>
+            {isEditing ? (
+              <Input
+                id="email"
+                type="email"
+                value={editedUser.email}
+                onChange={(e) => setEditedUser({ ...editedUser, email: e.target.value })}
+              />
+            ) : (
+              <p className="text-sm font-medium py-2 flex items-center gap-2">
+                <Mail className="h-4 w-4 text-muted-foreground" />
+                {user.email}
+              </p>
+            )}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="phone">Téléphone</Label>
+            {isEditing ? (
+              <Input
+                id="phone"
+                value={editedUser.phone}
+                onChange={(e) => setEditedUser({ ...editedUser, phone: e.target.value })}
+              />
+            ) : (
+              <p className="text-sm font-medium py-2 flex items-center gap-2">
+                <Phone className="h-4 w-4 text-muted-foreground" />
+                {user.phone}
+              </p>
+            )}
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="company">Entreprise</Label>
+              {isEditing ? (
+                <Input
+                  id="company"
+                  value={editedUser.company}
+                  onChange={(e) => setEditedUser({ ...editedUser, company: e.target.value })}
+                />
+              ) : (
+                <p className="text-sm font-medium py-2 flex items-center gap-2">
+                  <Building className="h-4 w-4 text-muted-foreground" />
+                  {user.company}
+                </p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="department">Département</Label>
+              {isEditing ? (
+                <Input
+                  id="department"
+                  value={editedUser.department}
+                  onChange={(e) => setEditedUser({ ...editedUser, department: e.target.value })}
+                />
+              ) : (
+                <p className="text-sm font-medium py-2">{user.department}</p>
+              )}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="role">Rôle</Label>
+              {isEditing ? (
+                <Input
+                  id="role"
+                  value={editedUser.role}
+                  onChange={(e) => setEditedUser({ ...editedUser, role: e.target.value })}
+                />
+              ) : (
+                <Badge variant="secondary">{user.role}</Badge>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label>Statut</Label>
+              {isEditing ? (
+                <select
+                  value={editedUser.status}
+                  onChange={(e) => setEditedUser({ ...editedUser, status: e.target.value as User['status'] })}
+                  className="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm"
+                >
+                  <option value="active">Actif</option>
+                  <option value="pending">En attente</option>
+                  <option value="inactive">Inactif</option>
+                </select>
+              ) : (
+                <div className="py-2">
+                  <Badge
+                    variant={user.status === 'active' ? 'default' : user.status === 'pending' ? 'secondary' : 'destructive'}
+                  >
+                    {user.status === 'active' ? 'Actif' : user.status === 'pending' ? 'En attente' : 'Inactif'}
+                  </Badge>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Salaire</Label>
+              {isEditing ? (
+                <Input
+                  type="number"
+                  value={editedUser.salary}
+                  onChange={(e) => setEditedUser({ ...editedUser, salary: Number(e.target.value) })}
+                />
+              ) : (
+                <p className="text-sm font-medium py-2 flex items-center gap-2">
+                  <DollarSign className="h-4 w-4 text-muted-foreground" />
+                  {new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' }).format(user.salary)}
+                </p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label>Date d&apos;embauche</Label>
+              <p className="text-sm font-medium py-2 flex items-center gap-2">
+                <Calendar className="h-4 w-4 text-muted-foreground" />
+                {new Date(user.joinDate).toLocaleDateString('fr-FR')}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <DialogFooter className="gap-2">
+          {!isEditing ? (
+            <>
+              <Button variant="outline" onClick={() => onOpenChange(false)}>
+                Fermer
+              </Button>
+              <Button onClick={() => setIsEditing(true)}>
+                <Edit className="mr-2 h-4 w-4" />
+                Modifier
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button variant="outline" onClick={() => {
+                setEditedUser({ ...user });
+                setIsEditing(mode === 'edit' ? true : false);
+              }}>
+                Annuler
+              </Button>
+              <Button onClick={handleSave}>
+                <Save className="mr-2 h-4 w-4" />
+                Enregistrer
+              </Button>
+            </>
+          )}
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+// Alert Dialog pour supprimer un utilisateur
+interface UserDeleteDialogProps {
+  user: User | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onConfirm: (user: User) => void;
+}
+
+function UserDeleteDialog({ user, open, onOpenChange, onConfirm }: UserDeleteDialogProps) {
+  if (!user) return null;
+
+  return (
+    <AlertDialog open={open} onOpenChange={onOpenChange}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle className="flex items-center gap-2 text-destructive">
+            <Trash2 className="h-5 w-5" />
+            Confirmer la suppression
+          </AlertDialogTitle>
+          <AlertDialogDescription className="space-y-2">
+            <p>
+              Êtes-vous sûr de vouloir supprimer l&apos;utilisateur{' '}
+              <span className="font-semibold text-foreground">
+                {user.firstName} {user.lastName}
+              </span>{' '}
+              ?
+            </p>
+            <p className="text-sm">
+              Cette action est irréversible. Toutes les données associées à cet utilisateur seront définitivement supprimées.
+            </p>
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Annuler</AlertDialogCancel>
+          <AlertDialogAction
+            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            onClick={() => {
+              onConfirm(user);
+              toast.error(`Utilisateur ${user.firstName} ${user.lastName} supprimé`);
+            }}
+          >
+            <Trash2 className="mr-2 h-4 w-4" />
+            Supprimer
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+}
+
 // Table basique
 function BasicTable() {
   const t = useTranslations('tanstackTable');
-  const [data] = useState(() => generateUsers().slice(0, 10));
+  const [data, setData] = useState(() => generateUsers().slice(0, 10));
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [globalFilter, setGlobalFilter] = useState('');
+
+  // Dialog states
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [viewEditDialogOpen, setViewEditDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [dialogMode, setDialogMode] = useState<'view' | 'edit'>('view');
+
+  const handleView = (user: User) => {
+    setSelectedUser(user);
+    setDialogMode('view');
+    setViewEditDialogOpen(true);
+  };
+
+  const handleEdit = (user: User) => {
+    setSelectedUser(user);
+    setDialogMode('edit');
+    setViewEditDialogOpen(true);
+  };
+
+  const handleDelete = (user: User) => {
+    setSelectedUser(user);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleSaveUser = (updatedUser: User) => {
+    setData(prev => prev.map(u => u.id === updatedUser.id ? updatedUser : u));
+  };
+
+  const handleConfirmDelete = (user: User) => {
+    setData(prev => prev.filter(u => u.id !== user.id));
+  };
 
   const columns = useMemo<ColumnDef<User>[]>(
     () => [
@@ -305,18 +640,18 @@ function BasicTable() {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => toast.success(`Voir ${row.original.firstName}`)}>
+              <DropdownMenuItem onClick={() => handleView(row.original)}>
                 <Eye className="mr-2 h-4 w-4" />
                 Voir
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => toast.success(`Éditer ${row.original.firstName}`)}>
+              <DropdownMenuItem onClick={() => handleEdit(row.original)}>
                 <Edit className="mr-2 h-4 w-4" />
                 Éditer
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem 
+              <DropdownMenuItem
                 className="text-red-600"
-                onClick={() => toast.error(`Supprimer ${row.original.firstName}`)}
+                onClick={() => handleDelete(row.original)}
               >
                 <Trash2 className="mr-2 h-4 w-4" />
                 Supprimer
@@ -431,6 +766,21 @@ function BasicTable() {
           </Button>
         </div>
       </div>
+
+      {/* Dialogs */}
+      <UserViewEditDialog
+        user={selectedUser}
+        open={viewEditDialogOpen}
+        onOpenChange={setViewEditDialogOpen}
+        mode={dialogMode}
+        onSave={handleSaveUser}
+      />
+      <UserDeleteDialog
+        user={selectedUser}
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onConfirm={handleConfirmDelete}
+      />
     </div>
   );
 }
@@ -438,12 +788,43 @@ function BasicTable() {
 // Table avancée avec sélection et filtres
 function AdvancedTable() {
   const t = useTranslations('tanstackTable');
-  const [data] = useState(() => generateUsers());
+  const [data, setData] = useState(() => generateUsers());
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
   const [globalFilter, setGlobalFilter] = useState('');
+
+  // Dialog states
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [viewEditDialogOpen, setViewEditDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [dialogMode, setDialogMode] = useState<'view' | 'edit'>('view');
+
+  const handleView = (user: User) => {
+    setSelectedUser(user);
+    setDialogMode('view');
+    setViewEditDialogOpen(true);
+  };
+
+  const handleEdit = (user: User) => {
+    setSelectedUser(user);
+    setDialogMode('edit');
+    setViewEditDialogOpen(true);
+  };
+
+  const handleDelete = (user: User) => {
+    setSelectedUser(user);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleSaveUser = (updatedUser: User) => {
+    setData(prev => prev.map(u => u.id === updatedUser.id ? updatedUser : u));
+  };
+
+  const handleConfirmDelete = (user: User) => {
+    setData(prev => prev.filter(u => u.id !== user.id));
+  };
 
   const columns = useMemo<ColumnDef<User>[]>(
     () => [
@@ -583,14 +964,30 @@ function AdvancedTable() {
             <DropdownMenuContent align="end">
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
               <DropdownMenuItem
-                onClick={() => navigator.clipboard.writeText(row.original.id)}
+                onClick={() => {
+                  navigator.clipboard.writeText(row.original.id);
+                  toast.success('ID copié dans le presse-papier');
+                }}
               >
                 Copier ID utilisateur
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>Voir détails</DropdownMenuItem>
-              <DropdownMenuItem>Modifier</DropdownMenuItem>
-              <DropdownMenuItem className="text-red-600">Supprimer</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleView(row.original)}>
+                <Eye className="mr-2 h-4 w-4" />
+                Voir détails
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => handleEdit(row.original)}>
+                <Edit className="mr-2 h-4 w-4" />
+                Modifier
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                className="text-red-600"
+                onClick={() => handleDelete(row.original)}
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                Supprimer
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         ),
@@ -776,6 +1173,21 @@ function AdvancedTable() {
           </div>
         </div>
       </div>
+
+      {/* Dialogs */}
+      <UserViewEditDialog
+        user={selectedUser}
+        open={viewEditDialogOpen}
+        onOpenChange={setViewEditDialogOpen}
+        mode={dialogMode}
+        onSave={handleSaveUser}
+      />
+      <UserDeleteDialog
+        user={selectedUser}
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onConfirm={handleConfirmDelete}
+      />
     </div>
   );
 }
