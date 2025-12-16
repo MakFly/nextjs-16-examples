@@ -1,4 +1,7 @@
+'use client';
+
 import { Suspense } from 'react';
+import { useTranslations } from 'next-intl';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -256,6 +259,8 @@ function ProductSkeleton() {
 }
 
 export default function NextjsPage() {
+  const t = useTranslations('nextjs');
+  
   return (
     <div className="min-h-screen">
       {/* Header */}
@@ -263,12 +268,11 @@ export default function NextjsPage() {
         <div className="container mx-auto px-4 py-12 md:py-16">
           <div className="max-w-3xl">
             <Badge variant="secondary" className="mb-4 text-xs tracking-wider uppercase">
-              Core
+              {t('badge')}
             </Badge>
-            <h1 className="mb-4">Next.js App Router</h1>
+            <h1 className="mb-4">{t('title')}</h1>
             <p className="text-lg text-muted-foreground leading-relaxed">
-              Exemples concrets d&apos;utilisation de Next.js App Router avec des cas d&apos;usage réels :
-              blog, e-commerce, dashboard, et plus encore.
+              {t('description')}
             </p>
             <div className="w-12 h-1 bg-accent mt-6" />
           </div>
@@ -283,11 +287,11 @@ export default function NextjsPage() {
             <span className="hidden sm:inline">Pourquoi/Quand</span>
             <span className="sm:hidden">?</span>
           </TabsTrigger>
-          <TabsTrigger value="routing">Routing</TabsTrigger>
-          <TabsTrigger value="layouts">Layouts</TabsTrigger>
-          <TabsTrigger value="loading">Loading</TabsTrigger>
-          <TabsTrigger value="examples">Exemples</TabsTrigger>
-          <TabsTrigger value="patterns">Patterns</TabsTrigger>
+          <TabsTrigger value="routing">{t('tabs.routing')}</TabsTrigger>
+          <TabsTrigger value="layouts">{t('tabs.layouts')}</TabsTrigger>
+          <TabsTrigger value="loading">{t('tabs.loading')}</TabsTrigger>
+          <TabsTrigger value="examples">{t('tabs.examples')}</TabsTrigger>
+          <TabsTrigger value="patterns">{t('tabs.patterns')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="why-when">
@@ -299,10 +303,10 @@ export default function NextjsPage() {
             <CardHeader>
               <CardTitle className="flex items-center">
                 <Route className="mr-2 h-5 w-5" />
-                Routing Basé sur les Fichiers
+                {t('fileBasedRouting')}
               </CardTitle>
               <CardDescription>
-                Structure de fichiers pour différents types d'applications
+                {t('fileBasedRoutingDesc')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -310,7 +314,7 @@ export default function NextjsPage() {
                 <div>
                   <h3 className="font-semibold mb-3 flex items-center">
                     <BookOpen className="mr-2 h-4 w-4" />
-                    Blog Application
+                    {t('blogApplication')}
                   </h3>
                   <div className="bg-muted rounded-lg p-4 font-mono text-sm">
                     <div className="space-y-1">
@@ -336,7 +340,7 @@ export default function NextjsPage() {
                 <div>
                   <h3 className="font-semibold mb-3 flex items-center">
                     <ShoppingCart className="mr-2 h-4 w-4" />
-                    E-commerce Application
+                    {t('ecommerceApplication')}
                   </h3>
                   <div className="bg-muted rounded-lg p-4 font-mono text-sm">
                     <div className="space-y-1">
@@ -475,10 +479,10 @@ export default function MarketingLayout({
             <CardHeader>
               <CardTitle className="flex items-center">
                 <Layout className="mr-2 h-5 w-5" />
-                Layouts Avancés et Imbriqués
+                {t('advancedLayouts')}
               </CardTitle>
               <CardDescription>
-                Exemples concrets de layouts pour différents types d'applications
+                {t('advancedLayoutsDesc')}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -646,30 +650,30 @@ export default function ShopLayout({
             <CardHeader>
               <CardTitle className="flex items-center">
                 <Loader className="mr-2 h-5 w-5" />
-                États de Chargement et Streaming
+                {t('loadingStates')}
               </CardTitle>
               <CardDescription>
-                Exemples concrets de loading states et streaming UI
+                {t('loadingStatesDesc')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="grid md:grid-cols-3 gap-6">
                 <div>
-                  <h3 className="font-semibold mb-3">Blog Posts</h3>
+                  <h3 className="font-semibold mb-3">{t('blogPosts')}</h3>
                   <Suspense fallback={<BlogSkeleton />}>
                     <BlogPosts />
                   </Suspense>
                 </div>
                 
                 <div>
-                  <h3 className="font-semibold mb-3">User Profile</h3>
+                  <h3 className="font-semibold mb-3">{t('userProfile')}</h3>
                   <Suspense fallback={<UserSkeleton />}>
                     <UserProfile />
                   </Suspense>
                 </div>
                 
                 <div>
-                  <h3 className="font-semibold mb-3">Products</h3>
+                  <h3 className="font-semibold mb-3">{t('products')}</h3>
                   <Suspense fallback={<ProductSkeleton />}>
                     <ProductGrid />
                   </Suspense>
@@ -801,9 +805,9 @@ export default function ProductsPage() {
         <TabsContent value="examples" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Exemples d'Applications Complètes</CardTitle>
+              <CardTitle>{t('completeExamples')}</CardTitle>
               <CardDescription>
-                Découvrez des applications complètes construites avec Next.js App Router
+                {t('completeExamplesDesc')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -811,22 +815,22 @@ export default function ProductsPage() {
                 <div className="p-6 border rounded-lg hover:shadow-lg transition-shadow">
                   <div className="flex items-center mb-4">
                     <BookOpen className="h-6 w-6 text-blue-600 mr-2" />
-                    <h3 className="text-lg font-semibold">Blog/CMS</h3>
+                    <h3 className="text-lg font-semibold">{t('blogCms')}</h3>
                   </div>
                   <div className="space-y-2 text-sm mb-4">
-                    <p><strong>Fonctionnalités :</strong></p>
+                    <p><strong>{t('features')}</strong></p>
                     <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-                      <li>Page d'accueil avec articles récents</li>
-                      <li>Liste d'articles avec pagination</li>
-                      <li>Pages d'articles individuels</li>
-                      <li>Catégories et tags</li>
-                      <li>Recherche et filtres</li>
-                      <li>Interface responsive</li>
+                      <li>{t('blogFeatures.homepage')}</li>
+                      <li>{t('blogFeatures.articleList')}</li>
+                      <li>{t('blogFeatures.individualArticles')}</li>
+                      <li>{t('blogFeatures.categories')}</li>
+                      <li>{t('blogFeatures.search')}</li>
+                      <li>{t('blogFeatures.responsive')}</li>
                     </ul>
                   </div>
                   <Button className="w-full" asChild>
                     <Link href="/examples/blog">
-                      Voir l'exemple
+                      {t('viewExample')}
                       <ExternalLink className="ml-2 h-4 w-4" />
                     </Link>
                   </Button>
@@ -835,22 +839,22 @@ export default function ProductsPage() {
                 <div className="p-6 border rounded-lg hover:shadow-lg transition-shadow">
                   <div className="flex items-center mb-4">
                     <ShoppingCart className="h-6 w-6 text-green-600 mr-2" />
-                    <h3 className="text-lg font-semibold">E-commerce</h3>
+                    <h3 className="text-lg font-semibold">{t('ecommerce')}</h3>
                   </div>
                   <div className="space-y-2 text-sm mb-4">
-                    <p><strong>Fonctionnalités :</strong></p>
+                    <p><strong>{t('features')}</strong></p>
                     <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-                      <li>Catalogue produits avec filtres</li>
-                      <li>Pages produits détaillées</li>
-                      <li>Panier et système de notation</li>
-                      <li>Interface utilisateur moderne</li>
-                      <li>Recherche avancée</li>
-                      <li>Design responsive</li>
+                      <li>{t('ecommerceFeatures.catalog')}</li>
+                      <li>{t('ecommerceFeatures.productPages')}</li>
+                      <li>{t('ecommerceFeatures.cart')}</li>
+                      <li>{t('ecommerceFeatures.modernUI')}</li>
+                      <li>{t('ecommerceFeatures.advancedSearch')}</li>
+                      <li>{t('ecommerceFeatures.responsiveDesign')}</li>
                     </ul>
                   </div>
                   <Button className="w-full" asChild>
                     <Link href="/examples/ecommerce">
-                      Voir l'exemple
+                      {t('viewExample')}
                       <ExternalLink className="ml-2 h-4 w-4" />
                     </Link>
                   </Button>
@@ -859,22 +863,22 @@ export default function ProductsPage() {
                 <div className="p-6 border rounded-lg hover:shadow-lg transition-shadow">
                   <div className="flex items-center mb-4">
                     <User className="h-6 w-6 text-purple-600 mr-2" />
-                    <h3 className="text-lg font-semibold">SaaS Dashboard</h3>
+                    <h3 className="text-lg font-semibold">{t('saasDashboard')}</h3>
                   </div>
                   <div className="space-y-2 text-sm mb-4">
                     <p><strong>Modules :</strong></p>
                     <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-                      <li>Dashboard avec métriques</li>
-                      <li>Graphiques interactifs</li>
-                      <li>Gestion des données</li>
-                      <li>Interface d'administration</li>
-                      <li>Rapports et analytics</li>
-                      <li>Navigation sidebar</li>
+                      <li>{t('saasFeatures.dashboard')}</li>
+                      <li>{t('saasFeatures.charts')}</li>
+                      <li>{t('saasFeatures.dataManagement')}</li>
+                      <li>{t('saasFeatures.admin')}</li>
+                      <li>{t('saasFeatures.reports')}</li>
+                      <li>{t('saasFeatures.sidebar')}</li>
                     </ul>
                   </div>
                   <Button className="w-full" asChild>
                     <Link href="/examples/dashboard">
-                      Voir l'exemple
+                      {t('viewExample')}
                       <ExternalLink className="ml-2 h-4 w-4" />
                     </Link>
                   </Button>
@@ -883,22 +887,22 @@ export default function ProductsPage() {
                 <div className="p-6 border rounded-lg hover:shadow-lg transition-shadow">
                   <div className="flex items-center mb-4">
                     <Globe className="h-6 w-6 text-orange-600 mr-2" />
-                    <h3 className="text-lg font-semibold">Site Corporate</h3>
+                    <h3 className="text-lg font-semibold">{t('corporateSite')}</h3>
                   </div>
                   <div className="space-y-2 text-sm mb-4">
                     <p><strong>Pages :</strong></p>
                     <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-                      <li>Landing page optimisée</li>
-                      <li>Présentation des services</li>
-                      <li>Équipe et témoignages</li>
-                      <li>Portfolio de projets</li>
-                      <li>Formulaire de contact</li>
-                      <li>Design professionnel</li>
+                      <li>{t('corporateFeatures.landing')}</li>
+                      <li>{t('corporateFeatures.services')}</li>
+                      <li>{t('corporateFeatures.team')}</li>
+                      <li>{t('corporateFeatures.portfolio')}</li>
+                      <li>{t('corporateFeatures.contact')}</li>
+                      <li>{t('corporateFeatures.professional')}</li>
                     </ul>
                   </div>
                   <Button className="w-full" asChild>
                     <Link href="/examples/corporate">
-                      Voir l'exemple
+                      {t('viewExample')}
                       <ExternalLink className="ml-2 h-4 w-4" />
                     </Link>
                   </Button>
@@ -908,15 +912,14 @@ export default function ProductsPage() {
               <div className="bg-blue-50 dark:bg-blue-950 p-6 rounded-lg">
                 <h4 className="font-semibold mb-2 flex items-center">
                   <ExternalLink className="h-5 w-5 mr-2" />
-                  Voir tous les exemples
+                  {t('viewAllExamples')}
                 </h4>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Explorez la collection complète d'exemples avec du code source détaillé 
-                  et des explications pas à pas.
+                  {t('exploreCollection')}
                 </p>
                 <Button asChild>
                   <Link href="/examples">
-                    Accéder aux exemples
+                    {t('accessExamples')}
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
@@ -993,9 +996,9 @@ export default function ProductsPage() {
         <TabsContent value="patterns" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Patterns Avancés</CardTitle>
+              <CardTitle>{t('advancedPatterns')}</CardTitle>
               <CardDescription>
-                Techniques avancées pour optimiser vos applications Next.js
+                {t('advancedPatternsDesc')}
               </CardDescription>
             </CardHeader>
             <CardContent>

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
+import { useTranslations } from 'next-intl';
 import {
   useReactTable,
   getCoreRowModel,
@@ -238,6 +239,7 @@ const generateSales = (): Sale[] => {
 
 // Table basique
 function BasicTable() {
+  const t = useTranslations('tanstackTable');
   const [data] = useState(() => generateUsers().slice(0, 10));
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -280,7 +282,7 @@ function BasicTable() {
       },
       {
         accessorKey: 'status',
-        header: 'Statut',
+        header: t('status'),
         cell: ({ row }) => {
           const status = row.getValue('status') as string;
           return (
@@ -324,7 +326,7 @@ function BasicTable() {
         ),
       },
     ],
-    []
+    [t]
   );
 
   const table = useReactTable({
@@ -349,7 +351,7 @@ function BasicTable() {
       <div className="flex items-center space-x-2">
         <Search className="h-4 w-4 text-gray-400" />
         <Input
-          placeholder="Rechercher..."
+          placeholder={t('search')}
           value={globalFilter ?? ''}
           onChange={(event) => setGlobalFilter(String(event.target.value))}
           className="max-w-sm"
@@ -397,7 +399,7 @@ function BasicTable() {
             ) : (
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
-                  Aucun résultat.
+                  {t('noResults')}
                 </TableCell>
               </TableRow>
             )}
@@ -408,7 +410,7 @@ function BasicTable() {
       <div className="flex items-center justify-between space-x-2 py-4">
         <div className="text-sm text-muted-foreground">
           {table.getFilteredSelectedRowModel().rows.length} sur{' '}
-          {table.getFilteredRowModel().rows.length} ligne(s) sélectionnée(s).
+          {table.getFilteredRowModel().rows.length} {t('selectedRows')}
         </div>
         <div className="flex items-center space-x-2">
           <Button
@@ -417,7 +419,7 @@ function BasicTable() {
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
           >
-            Précédent
+            {t('previous')}
           </Button>
           <Button
             variant="outline"
@@ -425,7 +427,7 @@ function BasicTable() {
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
           >
-            Suivant
+            {t('next')}
           </Button>
         </div>
       </div>
@@ -435,6 +437,7 @@ function BasicTable() {
 
 // Table avancée avec sélection et filtres
 function AdvancedTable() {
+  const t = useTranslations('tanstackTable');
   const [data] = useState(() => generateUsers());
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -623,7 +626,7 @@ function AdvancedTable() {
         <div className="flex items-center space-x-2">
           <Search className="h-4 w-4 text-gray-400" />
           <Input
-            placeholder="Filtrer les utilisateurs..."
+            placeholder={t('filterUsers')}
             value={globalFilter ?? ''}
             onChange={(event) => setGlobalFilter(String(event.target.value))}
             className="max-w-sm"
@@ -634,7 +637,7 @@ function AdvancedTable() {
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="ml-auto">
                 <Eye className="mr-2 h-4 w-4" />
-                Colonnes <ChevronDown className="ml-2 h-4 w-4" />
+                {t('columnsLabel')} <ChevronDown className="ml-2 h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
@@ -657,11 +660,11 @@ function AdvancedTable() {
           </DropdownMenu>
           <Button variant="outline">
             <Download className="mr-2 h-4 w-4" />
-            Exporter
+            {t('export')}
           </Button>
           <Button>
             <Plus className="mr-2 h-4 w-4" />
-            Ajouter
+            {t('add')}
           </Button>
         </div>
       </div>
@@ -699,7 +702,7 @@ function AdvancedTable() {
             ) : (
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
-                  Aucun résultat.
+                  {t('noResults')}
                 </TableCell>
               </TableRow>
             )}
@@ -710,11 +713,11 @@ function AdvancedTable() {
       <div className="flex items-center justify-between space-x-2 py-4">
         <div className="flex-1 text-sm text-muted-foreground">
           {table.getFilteredSelectedRowModel().rows.length} sur{' '}
-          {table.getFilteredRowModel().rows.length} ligne(s) sélectionnée(s).
+          {table.getFilteredRowModel().rows.length} {t('selectedRows')}
         </div>
         <div className="flex items-center space-x-6 lg:space-x-8">
           <div className="flex items-center space-x-2">
-            <p className="text-sm font-medium">Lignes par page</p>
+            <p className="text-sm font-medium">{t('rowsPerPage')}</p>
             <select
               value={table.getState().pagination.pageSize}
               onChange={(e) => {
@@ -730,7 +733,7 @@ function AdvancedTable() {
             </select>
           </div>
           <div className="flex w-[100px] items-center justify-center text-sm font-medium">
-            Page {table.getState().pagination.pageIndex + 1} sur{' '}
+            {t('page')} {table.getState().pagination.pageIndex + 1} {t('of')}{' '}
             {table.getPageCount()}
           </div>
           <div className="flex items-center space-x-2">
@@ -740,7 +743,7 @@ function AdvancedTable() {
               onClick={() => table.setPageIndex(0)}
               disabled={!table.getCanPreviousPage()}
             >
-              <span className="sr-only">Aller à la première page</span>
+              <span className="sr-only">{t('goToFirst')}</span>
               {'<<'}
             </Button>
             <Button
@@ -749,7 +752,7 @@ function AdvancedTable() {
               onClick={() => table.previousPage()}
               disabled={!table.getCanPreviousPage()}
             >
-              <span className="sr-only">Aller à la page précédente</span>
+              <span className="sr-only">{t('goToPrevious')}</span>
               {'<'}
             </Button>
             <Button
@@ -758,7 +761,7 @@ function AdvancedTable() {
               onClick={() => table.nextPage()}
               disabled={!table.getCanNextPage()}
             >
-              <span className="sr-only">Aller à la page suivante</span>
+              <span className="sr-only">{t('goToNext')}</span>
               {'>'}
             </Button>
             <Button
@@ -767,7 +770,7 @@ function AdvancedTable() {
               onClick={() => table.setPageIndex(table.getPageCount() - 1)}
               disabled={!table.getCanNextPage()}
             >
-              <span className="sr-only">Aller à la dernière page</span>
+              <span className="sr-only">{t('goToLast')}</span>
               {'>>'}
             </Button>
           </div>
@@ -779,6 +782,7 @@ function AdvancedTable() {
 
 // Table avec groupement
 function GroupedTable() {
+  const t = useTranslations('tanstackTable');
   const [data] = useState(() => generateSales());
   const [sorting, setSorting] = useState<SortingState>([]);
   const [grouping, setGrouping] = useState<GroupingState>(['region']);
@@ -920,16 +924,16 @@ function GroupedTable() {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-2">
-          <Label>Grouper par:</Label>
+          <Label>{t('groupBy')}</Label>
           <select
             value={grouping[0] || ''}
             onChange={(e) => setGrouping(e.target.value ? [e.target.value] : [])}
             className="h-8 rounded border border-input bg-background px-3 py-1 text-sm"
           >
-            <option value="">Aucun groupement</option>
-            <option value="region">Région</option>
-            <option value="salesperson">Commercial</option>
-            <option value="status">Statut</option>
+            <option value="">{t('noGrouping')}</option>
+            <option value="region">{t('region')}</option>
+            <option value="salesperson">{t('salesperson')}</option>
+            <option value="status">{t('status')}</option>
           </select>
         </div>
         <div className="flex items-center space-x-2">
@@ -937,7 +941,7 @@ function GroupedTable() {
             variant="outline"
             onClick={() => table.toggleAllRowsExpanded()}
           >
-            {table.getIsAllRowsExpanded() ? 'Réduire tout' : 'Développer tout'}
+            {table.getIsAllRowsExpanded() ? t('collapseAll') : t('expandAll')}
           </Button>
         </div>
       </div>
@@ -984,7 +988,7 @@ function GroupedTable() {
             ) : (
               <TableRow>
                 <TableCell colSpan={columns.length} className="h-24 text-center">
-                  Aucun résultat.
+                  {t('noResults')}
                 </TableCell>
               </TableRow>
             )}
@@ -994,7 +998,7 @@ function GroupedTable() {
 
       <div className="flex items-center justify-between space-x-2 py-4">
         <div className="text-sm text-muted-foreground">
-          {table.getFilteredRowModel().rows.length} ligne(s) au total.
+          {table.getFilteredRowModel().rows.length} {t('totalRows')}
         </div>
         <div className="flex items-center space-x-2">
           <Button
@@ -1003,7 +1007,7 @@ function GroupedTable() {
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
           >
-            Précédent
+            {t('previous')}
           </Button>
           <Button
             variant="outline"
@@ -1011,7 +1015,7 @@ function GroupedTable() {
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
           >
-            Suivant
+            {t('next')}
           </Button>
         </div>
       </div>
@@ -1020,6 +1024,8 @@ function GroupedTable() {
 }
 
 export default function TanStackTablePage() {
+  const t = useTranslations('tanstackTable');
+  
   return (
     <div className="min-h-screen">
       {/* Header */}
@@ -1027,11 +1033,11 @@ export default function TanStackTablePage() {
         <div className="container mx-auto px-4 py-12 md:py-16">
           <div className="max-w-3xl">
             <Badge variant="secondary" className="mb-4 text-xs tracking-wider uppercase">
-              Tables
+              {t('badge')}
             </Badge>
-            <h1 className="mb-4">TanStack Table</h1>
+            <h1 className="mb-4">{t('title')}</h1>
             <p className="text-lg text-muted-foreground leading-relaxed">
-              Maîtrisez les tableaux avancés avec TanStack Table : tri, filtrage, pagination, groupement et plus encore.
+              {t('description')}
             </p>
             <div className="w-12 h-1 bg-accent mt-6" />
           </div>
@@ -1046,11 +1052,11 @@ export default function TanStackTablePage() {
             <span className="hidden sm:inline">Pourquoi/Quand</span>
             <span className="sm:hidden">?</span>
           </TabsTrigger>
-          <TabsTrigger value="basics">Basics</TabsTrigger>
-          <TabsTrigger value="simple">Table Simple</TabsTrigger>
-          <TabsTrigger value="advanced">Table Avancée</TabsTrigger>
-          <TabsTrigger value="grouped">Groupement</TabsTrigger>
-          <TabsTrigger value="patterns">Patterns</TabsTrigger>
+          <TabsTrigger value="basics">{t('tabs.basics')}</TabsTrigger>
+          <TabsTrigger value="simple">{t('tabs.simple')}</TabsTrigger>
+          <TabsTrigger value="advanced">{t('tabs.advanced')}</TabsTrigger>
+          <TabsTrigger value="grouped">{t('tabs.grouped')}</TabsTrigger>
+          <TabsTrigger value="patterns">{t('tabs.patterns')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="why-when">
@@ -1062,33 +1068,33 @@ export default function TanStackTablePage() {
             <CardHeader>
               <CardTitle className="flex items-center">
                 <Users className="mr-2 h-5 w-5" />
-                Qu'est-ce que TanStack Table ?
+                {t('whatIs')}
               </CardTitle>
               <CardDescription>
-                Une bibliothèque headless pour construire des tableaux puissants et flexibles
+                {t('whatIsDesc')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid md:grid-cols-3 gap-4">
                 <div className="text-center p-4 border rounded-lg">
                   <TrendingUp className="h-8 w-8 text-blue-600 mx-auto mb-2" />
-                  <h3 className="font-semibold">Headless</h3>
+                  <h3 className="font-semibold">{t('headless')}</h3>
                   <p className="text-sm text-muted-foreground">
-                    Logique sans interface, contrôle total du design
+                    {t('headlessDesc')}
                   </p>
                 </div>
                 <div className="text-center p-4 border rounded-lg">
                   <Filter className="h-8 w-8 text-green-600 mx-auto mb-2" />
-                  <h3 className="font-semibold">Fonctionnalités</h3>
+                  <h3 className="font-semibold">{t('features')}</h3>
                   <p className="text-sm text-muted-foreground">
-                    Tri, filtrage, pagination, groupement
+                    {t('featuresDesc')}
                   </p>
                 </div>
                 <div className="text-center p-4 border rounded-lg">
                   <Users className="h-8 w-8 text-purple-600 mx-auto mb-2" />
-                  <h3 className="font-semibold">Performance</h3>
+                  <h3 className="font-semibold">{t('performance')}</h3>
                   <p className="text-sm text-muted-foreground">
-                    Optimisé pour de grandes quantités de données
+                    {t('performanceDesc')}
                   </p>
                 </div>
               </div>
@@ -1179,44 +1185,44 @@ function BasicTable() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Concepts clés</CardTitle>
+              <CardTitle>{t('keyConcepts')}</CardTitle>
               <CardDescription>
-                Les concepts fondamentaux de TanStack Table
+                {t('keyConceptsDesc')}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <h3 className="font-semibold mb-3 text-blue-600">Colonnes</h3>
+                  <h3 className="font-semibold mb-3 text-blue-600">{t('columns')}</h3>
                   <ul className="space-y-2 text-sm">
                     <li className="flex items-start">
                       <Badge variant="secondary" className="mr-2 mt-0.5">✓</Badge>
-                      Définition des colonnes avec accessorKey
+                      {t('accessorKey')}
                     </li>
                     <li className="flex items-start">
                       <Badge variant="secondary" className="mr-2 mt-0.5">✓</Badge>
-                      Cellules personnalisées avec cell function
+                      {t('customCells')}
                     </li>
                     <li className="flex items-start">
                       <Badge variant="secondary" className="mr-2 mt-0.5">✓</Badge>
-                      Headers interactifs avec tri
+                      {t('interactiveHeaders')}
                     </li>
                     <li className="flex items-start">
                       <Badge variant="secondary" className="mr-2 mt-0.5">✓</Badge>
-                      Visibilité et redimensionnement
+                      {t('visibility')}
                     </li>
                   </ul>
                 </div>
                 
                 <div>
-                  <h3 className="font-semibold mb-3 text-green-600">Fonctionnalités</h3>
+                  <h3 className="font-semibold mb-3 text-green-600">{t('tableFeatures')}</h3>
                   <ul className="space-y-2 text-sm text-muted-foreground">
-                    <li>• Tri multi-colonnes</li>
-                    <li>• Filtrage global et par colonne</li>
-                    <li>• Pagination avec contrôles</li>
-                    <li>• Sélection de lignes</li>
-                    <li>• Groupement et agrégation</li>
-                    <li>• Expansion de lignes</li>
+                    <li>• {t('multiSort')}</li>
+                    <li>• {t('globalColumnFilter')}</li>
+                    <li>• {t('pagination')}</li>
+                    <li>• {t('rowSelection')}</li>
+                    <li>• {t('grouping')}</li>
+                    <li>• {t('rowExpansion')}</li>
                   </ul>
                 </div>
               </div>
@@ -1227,9 +1233,9 @@ function BasicTable() {
         <TabsContent value="simple" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Table Simple</CardTitle>
+              <CardTitle>{t('simpleTable')}</CardTitle>
               <CardDescription>
-                Table basique avec tri et recherche globale
+                {t('simpleTableDesc')}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -1301,9 +1307,9 @@ const table = useReactTable({
         <TabsContent value="advanced" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Table Avancée</CardTitle>
+              <CardTitle>{t('advancedTable')}</CardTitle>
               <CardDescription>
-                Table complète avec sélection, filtres, visibilité des colonnes et pagination avancée
+                {t('advancedTableDesc')}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -1381,9 +1387,9 @@ const table = useReactTable({
         <TabsContent value="grouped" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Table avec Groupement</CardTitle>
+              <CardTitle>{t('groupedTable')}</CardTitle>
               <CardDescription>
-                Groupement de données avec agrégation et expansion
+                {t('groupedTableDesc')}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -1463,9 +1469,9 @@ const table = useReactTable({
         <TabsContent value="patterns" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Patterns Avancés</CardTitle>
+              <CardTitle>{t('advancedPatterns')}</CardTitle>
               <CardDescription>
-                Techniques avancées et bonnes pratiques
+                {t('advancedPatternsDesc')}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -1655,26 +1661,26 @@ function exportToJSON(table: Table<any>, filename: string) {
             <CardContent>
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <h3 className="font-semibold mb-3 text-green-600">✅ À faire</h3>
+                  <h3 className="font-semibold mb-3 text-green-600">{t('do')}</h3>
                   <ul className="space-y-2 text-sm">
-                    <li>• Utiliser useMemo pour les colonnes</li>
-                    <li>• Implémenter la virtualisation pour &gt; 1000 lignes</li>
-                    <li>• Optimiser les cellules personnalisées</li>
-                    <li>• Utiliser des clés stables pour les données</li>
-                    <li>• Implémenter le loading et error states</li>
-                    <li>• Ajouter l'accessibilité (ARIA labels)</li>
+                    <li>• {t('useMemo')}</li>
+                    <li>• {t('virtualization')}</li>
+                    <li>• {t('optimizeCells')}</li>
+                    <li>• {t('stableKeys')}</li>
+                    <li>• {t('loadingStates')}</li>
+                    <li>• {t('accessibility')}</li>
                   </ul>
                 </div>
                 
                 <div>
-                  <h3 className="font-semibold mb-3 text-red-600">❌ À éviter</h3>
+                  <h3 className="font-semibold mb-3 text-red-600">{t('avoid')}</h3>
                   <ul className="space-y-2 text-sm text-muted-foreground">
-                    <li>• Recréer les colonnes à chaque render</li>
-                    <li>• Trop de colonnes visibles simultanément</li>
-                    <li>• Filtres complexes sans debouncing</li>
-                    <li>• Mutations directes des données</li>
-                    <li>• Oublier la pagination pour grandes données</li>
-                    <li>• Cellules trop complexes sans mémorisation</li>
+                    <li>• {t('recreateColumns')}</li>
+                    <li>• {t('tooManyColumns')}</li>
+                    <li>• {t('complexFilters')}</li>
+                    <li>• {t('directMutations')}</li>
+                    <li>• {t('forgetPagination')}</li>
+                    <li>• {t('complexCells')}</li>
                   </ul>
                 </div>
               </div>

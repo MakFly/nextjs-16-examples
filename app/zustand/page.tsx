@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -112,6 +113,7 @@ const zustandWhyWhen = {
 };
 
 export default function ZustandPage() {
+  const t = useTranslations('zustand');
   const { count, increment, decrement, reset, setCount } = useCounterStore();
   const { todos, addTodo, toggleTodo, removeTodo, clearCompleted } = useTodoStore();
   const [newTodo, setNewTodo] = useState('');
@@ -121,7 +123,7 @@ export default function ZustandPage() {
     if (newTodo.trim()) {
       addTodo(newTodo.trim());
       setNewTodo('');
-      toast.success('Todo added!');
+      toast.success(t('todoAdded'));
     }
   };
 
@@ -141,11 +143,11 @@ export default function ZustandPage() {
         <div className="container mx-auto px-4 py-12 md:py-16">
           <div className="max-w-3xl">
             <Badge variant="secondary" className="mb-4 text-xs tracking-wider uppercase">
-              State Management
+              {t('badge')}
             </Badge>
-            <h1 className="mb-4">Zustand</h1>
+            <h1 className="mb-4">{t('title')}</h1>
             <p className="text-lg text-muted-foreground leading-relaxed">
-              Learn simple, scalable state management with Zustand.
+              {t('description')}
             </p>
             <div className="w-12 h-1 bg-accent mt-6" />
           </div>
@@ -160,10 +162,10 @@ export default function ZustandPage() {
             <span className="hidden sm:inline">Pourquoi/Quand</span>
             <span className="sm:hidden">?</span>
           </TabsTrigger>
-          <TabsTrigger value="basics">Basics</TabsTrigger>
-          <TabsTrigger value="counter">Counter Demo</TabsTrigger>
-          <TabsTrigger value="todos">Todo Demo</TabsTrigger>
-          <TabsTrigger value="advanced">Advanced</TabsTrigger>
+          <TabsTrigger value="basics">{t('tabs.basics')}</TabsTrigger>
+          <TabsTrigger value="counter">{t('tabs.counter')}</TabsTrigger>
+          <TabsTrigger value="todos">{t('tabs.todos')}</TabsTrigger>
+          <TabsTrigger value="advanced">{t('tabs.advanced')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="why-when">
@@ -173,32 +175,32 @@ export default function ZustandPage() {
         <TabsContent value="basics" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>What is Zustand?</CardTitle>
+              <CardTitle>{t('whatIs')}</CardTitle>
               <CardDescription>
-                A small, fast, and scalable bearbones state-management solution
+                {t('whatIsDesc')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid md:grid-cols-3 gap-4">
                 <div className="text-center p-4 border rounded-lg">
                   <div className="text-2xl font-bold text-blue-600 mb-2">2.6kB</div>
-                  <h3 className="font-semibold">Tiny Bundle</h3>
+                  <h3 className="font-semibold">{t('tinyBundle')}</h3>
                   <p className="text-sm text-muted-foreground">
-                    Minimal bundle size impact
+                    {t('tinyBundleDesc')}
                   </p>
                 </div>
                 <div className="text-center p-4 border rounded-lg">
                   <div className="text-2xl font-bold text-green-600 mb-2">Zero</div>
-                  <h3 className="font-semibold">No Boilerplate</h3>
+                  <h3 className="font-semibold">{t('noBoilerplate')}</h3>
                   <p className="text-sm text-muted-foreground">
-                    Simple API, no providers needed
+                    {t('noBoilerplateDesc')}
                   </p>
                 </div>
                 <div className="text-center p-4 border rounded-lg">
                   <div className="text-2xl font-bold text-purple-600 mb-2">TS</div>
-                  <h3 className="font-semibold">TypeScript</h3>
+                  <h3 className="font-semibold">{t('typescript')}</h3>
                   <p className="text-sm text-muted-foreground">
-                    Full TypeScript support
+                    {t('typescriptDesc')}
                   </p>
                 </div>
               </div>
@@ -240,42 +242,42 @@ function Counter() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Key Features</CardTitle>
+              <CardTitle>{t('keyFeatures')}</CardTitle>
               <CardDescription>
-                What makes Zustand different from other state management solutions
+                {t('keyFeaturesDesc')}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <h3 className="font-semibold mb-3">Advantages</h3>
+                  <h3 className="font-semibold mb-3">{t('advantages')}</h3>
                   <ul className="space-y-2 text-sm">
                     <li className="flex items-center">
                       <Check className="h-4 w-4 text-green-600 mr-2" />
-                      No providers or context needed
+                      {t('noProviders')}
                     </li>
                     <li className="flex items-center">
                       <Check className="h-4 w-4 text-green-600 mr-2" />
-                      Works with React and non-React code
+                      {t('worksEverywhere')}
                     </li>
                     <li className="flex items-center">
                       <Check className="h-4 w-4 text-green-600 mr-2" />
-                      Supports middleware (persist, devtools)
+                      {t('middleware')}
                     </li>
                     <li className="flex items-center">
                       <Check className="h-4 w-4 text-green-600 mr-2" />
-                      Async actions out of the box
+                      {t('asyncActions')}
                     </li>
                   </ul>
                 </div>
                 <div>
-                  <h3 className="font-semibold mb-3">Use Cases</h3>
+                  <h3 className="font-semibold mb-3">{t('useCases')}</h3>
                   <ul className="space-y-2 text-sm text-muted-foreground">
-                    <li>• Global application state</li>
-                    <li>• User authentication state</li>
-                    <li>• Shopping cart management</li>
-                    <li>• Theme and UI preferences</li>
-                    <li>• API data caching</li>
+                    <li>• {t('globalState')}</li>
+                    <li>• {t('authState')}</li>
+                    <li>• {t('shoppingCart')}</li>
+                    <li>• {t('theme')}</li>
+                    <li>• {t('apiCache')}</li>
                   </ul>
                 </div>
               </div>
@@ -286,9 +288,9 @@ function Counter() {
         <TabsContent value="counter" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Interactive Counter</CardTitle>
+              <CardTitle>{t('interactiveCounter')}</CardTitle>
               <CardDescription>
-                A live demo of Zustand store with persistence
+                {t('interactiveCounterDesc')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -308,17 +310,17 @@ function Counter() {
                 <div className="flex justify-center space-x-2">
                   <Input
                     type="number"
-                    placeholder="Set custom value"
+                    placeholder={t('setCustomValue')}
                     value={customCount}
                     onChange={(e) => setCustomCount(e.target.value)}
                     className="w-40"
                   />
-                  <Button onClick={handleSetCustomCount}>Set</Button>
+                  <Button onClick={handleSetCustomCount}>{t('set')}</Button>
                 </div>
               </div>
 
               <Badge variant="secondary" className="w-full justify-center py-2">
-                This counter persists across page reloads using Zustand persist middleware
+                {t('counterPersists')}
               </Badge>
 
               <CodeExample
@@ -361,29 +363,29 @@ export const useCounterStore = create<CounterState>()(
         <TabsContent value="todos" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Todo List Demo</CardTitle>
+              <CardTitle>{t('todoListDemo')}</CardTitle>
               <CardDescription>
-                A more complex example with arrays and multiple actions
+                {t('todoListDemoDesc')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex space-x-2">
                 <Input
-                  placeholder="Add a new todo..."
+                  placeholder={t('addNewTodo')}
                   value={newTodo}
                   onChange={(e) => setNewTodo(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleAddTodo()}
                 />
                 <Button onClick={handleAddTodo}>
                   <Plus className="h-4 w-4 mr-2" />
-                  Add
+                  {t('add')}
                 </Button>
               </div>
 
               <div className="space-y-2">
                 {todos.length === 0 ? (
                   <p className="text-muted-foreground text-center py-8">
-                    No todos yet. Add one above!
+                    {t('noTodos')}
                   </p>
                 ) : (
                   todos.map((todo) => (
@@ -429,14 +431,14 @@ export const useCounterStore = create<CounterState>()(
                   onClick={clearCompleted}
                   className="w-full"
                 >
-                  Clear Completed
+                  {t('clearCompleted')}
                 </Button>
               )}
 
               <div className="flex justify-center space-x-4 text-sm text-muted-foreground">
-                <span>Total: {todos.length}</span>
-                <span>Completed: {todos.filter(t => t.completed).length}</span>
-                <span>Remaining: {todos.filter(t => !t.completed).length}</span>
+                <span>{t('total')} {todos.length}</span>
+                <span>{t('completed')} {todos.filter(t => t.completed).length}</span>
+                <span>{t('remaining')} {todos.filter(t => !t.completed).length}</span>
               </div>
 
               <CodeExample
@@ -498,9 +500,9 @@ export const useTodoStore = create<TodoState>()(
         <TabsContent value="advanced" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Middleware</CardTitle>
+              <CardTitle>{t('middleware')}</CardTitle>
               <CardDescription>
-                Enhance your stores with persistence, devtools, and more
+                {t('middlewareDesc')}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -564,9 +566,9 @@ useUserStore.subscribe(
 
           <Card>
             <CardHeader>
-              <CardTitle>Async Actions</CardTitle>
+              <CardTitle>{t('asyncActions')}</CardTitle>
               <CardDescription>
-                Handle asynchronous operations in your stores
+                {t('asyncActionsDesc')}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -651,9 +653,9 @@ export const useApiStore = create<ApiState>()(
 
           <Card>
             <CardHeader>
-              <CardTitle>Store Slicing</CardTitle>
+              <CardTitle>{t('storeSlicing')}</CardTitle>
               <CardDescription>
-                Split large stores into smaller, manageable slices
+                {t('storeSlicingDesc')}
               </CardDescription>
             </CardHeader>
             <CardContent>

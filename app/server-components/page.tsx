@@ -1,4 +1,7 @@
+'use client';
+
 import { Suspense } from 'react';
+import { useTranslations } from 'next-intl';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -155,7 +158,7 @@ async function ComplexServerData() {
         <CardHeader className="pb-3">
           <CardTitle className="text-sm flex items-center">
             <Users className="h-4 w-4 mr-2" />
-            Users
+            {t('users')}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -170,12 +173,12 @@ async function ComplexServerData() {
         <CardHeader className="pb-3">
           <CardTitle className="text-sm flex items-center">
             <TrendingUp className="h-4 w-4 mr-2" />
-            Growth
+            {t('growth')}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold text-green-600">{(stats as any).growth}</div>
-          <p className="text-xs text-muted-foreground">vs last month</p>
+          <p className="text-xs text-muted-foreground">{t('vsLastMonth')}</p>
         </CardContent>
       </Card>
       
@@ -183,12 +186,12 @@ async function ComplexServerData() {
         <CardHeader className="pb-3">
           <CardTitle className="text-sm flex items-center">
             <Clock className="h-4 w-4 mr-2" />
-            Active Today
+            {t('activeToday')}
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{(stats as any).activeToday}</div>
-          <p className="text-xs text-muted-foreground">online users</p>
+          <p className="text-xs text-muted-foreground">{t('onlineUsers')}</p>
         </CardContent>
       </Card>
     </div>
@@ -197,6 +200,8 @@ async function ComplexServerData() {
 
 // Loading Component
 function LoadingCard() {
+  // Note: This is a client component, but we can't use translations here
+  // as it's used in Suspense fallback. We'll keep it simple.
   return (
     <div className="p-4 border rounded-lg">
       <div className="flex items-center space-x-2">
@@ -208,6 +213,8 @@ function LoadingCard() {
 }
 
 export default function ServerComponentsPage() {
+  const t = useTranslations('serverComponents');
+  
   return (
     <div className="min-h-screen">
       {/* Header */}
@@ -215,11 +222,11 @@ export default function ServerComponentsPage() {
         <div className="container mx-auto px-4 py-12 md:py-16">
           <div className="max-w-3xl">
             <Badge variant="secondary" className="mb-4 text-xs tracking-wider uppercase">
-              Architecture
+              {t('badge')}
             </Badge>
-            <h1 className="mb-4">Server Components</h1>
+            <h1 className="mb-4">{t('title')}</h1>
             <p className="text-lg text-muted-foreground leading-relaxed">
-              Learn the difference between Server and Client Components, data fetching patterns, and optimization techniques.
+              {t('description')}
             </p>
             <div className="w-12 h-1 bg-accent mt-6" />
           </div>
@@ -234,10 +241,10 @@ export default function ServerComponentsPage() {
             <span className="hidden sm:inline">Pourquoi/Quand</span>
             <span className="sm:hidden">?</span>
           </TabsTrigger>
-          <TabsTrigger value="basics">Basics</TabsTrigger>
-          <TabsTrigger value="simple">Simple Example</TabsTrigger>
-          <TabsTrigger value="complex">Complex Example</TabsTrigger>
-          <TabsTrigger value="patterns">Patterns</TabsTrigger>
+          <TabsTrigger value="basics">{t('tabs.basics')}</TabsTrigger>
+          <TabsTrigger value="simple">{t('tabs.simple')}</TabsTrigger>
+          <TabsTrigger value="complex">{t('tabs.complex')}</TabsTrigger>
+          <TabsTrigger value="patterns">{t('tabs.patterns')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="why-when">
@@ -249,10 +256,10 @@ export default function ServerComponentsPage() {
             <CardHeader>
               <CardTitle className="flex items-center">
                 <Server className="mr-2 h-5 w-5" />
-                Server vs Client Components
+                {t('serverVsClient')}
               </CardTitle>
               <CardDescription>
-                Understanding when and how to use each type of component
+                {t('serverVsClientDesc')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -260,28 +267,28 @@ export default function ServerComponentsPage() {
                 <div className="p-4 border rounded-lg bg-blue-50 dark:bg-blue-950">
                   <div className="flex items-center mb-3">
                     <Server className="h-5 w-5 text-blue-600 mr-2" />
-                    <h3 className="font-semibold text-blue-800 dark:text-blue-200">Server Components</h3>
+                    <h3 className="font-semibold text-blue-800 dark:text-blue-200">{t('serverComponents')}</h3>
                   </div>
                   <ul className="text-sm space-y-1 text-blue-700 dark:text-blue-300">
-                    <li>• Render on the server</li>
-                    <li>• Can access databases directly</li>
-                    <li>• No JavaScript sent to client</li>
-                    <li>• Cannot use hooks or event handlers</li>
-                    <li>• Better for SEO and performance</li>
+                    <li>• {t('serverFeatures.render')}</li>
+                    <li>• {t('serverFeatures.databases')}</li>
+                    <li>• {t('serverFeatures.noJs')}</li>
+                    <li>• {t('serverFeatures.noHooks')}</li>
+                    <li>• {t('serverFeatures.seo')}</li>
                   </ul>
                 </div>
                 
                 <div className="p-4 border rounded-lg bg-orange-50 dark:bg-orange-950">
                   <div className="flex items-center mb-3">
                     <Monitor className="h-5 w-5 text-orange-600 mr-2" />
-                    <h3 className="font-semibold text-orange-800 dark:text-orange-200">Client Components</h3>
+                    <h3 className="font-semibold text-orange-800 dark:text-orange-200">{t('clientComponents')}</h3>
                   </div>
                   <ul className="text-sm space-y-1 text-orange-700 dark:text-orange-300">
-                    <li>• Render in the browser</li>
-                    <li>• Can use hooks and state</li>
-                    <li>• Handle user interactions</li>
-                    <li>• Access browser APIs</li>
-                    <li>• Interactive and dynamic</li>
+                    <li>• {t('clientFeatures.render')}</li>
+                    <li>• {t('clientFeatures.hooks')}</li>
+                    <li>• {t('clientFeatures.interactions')}</li>
+                    <li>• {t('clientFeatures.browserApis')}</li>
+                    <li>• {t('clientFeatures.interactive')}</li>
                   </ul>
                 </div>
               </div>
@@ -316,53 +323,53 @@ export default function ClientComponent() {
 
           <Card>
             <CardHeader>
-              <CardTitle>When to Use Each Type</CardTitle>
+              <CardTitle>{t('whenToUse')}</CardTitle>
               <CardDescription>
-                Decision matrix for choosing the right component type
+                {t('whenToUseDesc')}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <h3 className="font-semibold mb-3 text-blue-600">Use Server Components for:</h3>
+                  <h3 className="font-semibold mb-3 text-blue-600">{t('useServerFor')}</h3>
                   <ul className="space-y-2 text-sm">
                     <li className="flex items-start">
                       <Badge variant="secondary" className="mr-2 mt-0.5">✓</Badge>
-                      Data fetching from APIs or databases
+                      {t('dataFetching')}
                     </li>
                     <li className="flex items-start">
                       <Badge variant="secondary" className="mr-2 mt-0.5">✓</Badge>
-                      Static content and layouts
+                      {t('staticContent')}
                     </li>
                     <li className="flex items-start">
                       <Badge variant="secondary" className="mr-2 mt-0.5">✓</Badge>
-                      SEO-critical content
+                      {t('seoCritical')}
                     </li>
                     <li className="flex items-start">
                       <Badge variant="secondary" className="mr-2 mt-0.5">✓</Badge>
-                      Large dependencies (stay on server)
+                      {t('largeDeps')}
                     </li>
                   </ul>
                 </div>
                 
                 <div>
-                  <h3 className="font-semibold mb-3 text-orange-600">Use Client Components for:</h3>
+                  <h3 className="font-semibold mb-3 text-orange-600">{t('useClientFor')}</h3>
                   <ul className="space-y-2 text-sm">
                     <li className="flex items-start">
                       <Badge variant="secondary" className="mr-2 mt-0.5">✓</Badge>
-                      Interactive elements (forms, buttons)
+                      {t('interactive')}
                     </li>
                     <li className="flex items-start">
                       <Badge variant="secondary" className="mr-2 mt-0.5">✓</Badge>
-                      State management and hooks
+                      {t('stateManagement')}
                     </li>
                     <li className="flex items-start">
                       <Badge variant="secondary" className="mr-2 mt-0.5">✓</Badge>
-                      Browser APIs (localStorage, etc.)
+                      {t('browserApis')}
                     </li>
                     <li className="flex items-start">
                       <Badge variant="secondary" className="mr-2 mt-0.5">✓</Badge>
-                      Event handlers and user input
+                      {t('eventHandlers')}
                     </li>
                   </ul>
                 </div>
@@ -374,9 +381,9 @@ export default function ClientComponent() {
         <TabsContent value="simple" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Simple Server Component Example</CardTitle>
+              <CardTitle>{t('simpleExample')}</CardTitle>
               <CardDescription>
-                Basic data fetching and rendering on the server
+                {t('simpleExampleDesc')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -421,9 +428,9 @@ export default function Page() {
         <TabsContent value="complex" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Complex Server Component Example</CardTitle>
+              <CardTitle>{t('complexExample')}</CardTitle>
               <CardDescription>
-                Multiple data sources with parallel fetching and error handling
+                {t('complexExampleDesc')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -223,6 +224,7 @@ function CustomToastProvider({ children }: { children: React.ReactNode }) {
 
 // Notification Examples Component
 function NotificationExamples() {
+  const t = useTranslations('notifications');
   const [customToasts, setCustomToasts] = useState<Array<{
     id: string;
     title: string;
@@ -332,10 +334,10 @@ function NotificationExamples() {
         <CardHeader>
           <CardTitle className="flex items-center">
             <Bell className="mr-2 h-5 w-5" />
-            Sonner Toast Examples
+            {t('sonnerExamples')}
           </CardTitle>
           <CardDescription>
-            Built-in toast notifications with Sonner
+            {t('sonnerExamplesDesc')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -371,9 +373,9 @@ function NotificationExamples() {
       {/* Custom Toast Examples */}
       <Card>
         <CardHeader>
-          <CardTitle>Custom Toast Examples</CardTitle>
+          <CardTitle>{t('customExamples')}</CardTitle>
           <CardDescription>
-            Custom-built toast notifications with full control
+            {t('customExamplesDesc')}
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -416,6 +418,7 @@ function NotificationExamples() {
 
 // Server Action Toast Example
 function ServerActionToastExample() {
+  const t = useTranslations('notifications');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleServerAction = async (formData: FormData) => {
@@ -438,7 +441,7 @@ function ServerActionToastExample() {
         throw new Error('Server error occurred');
       }
 
-      toast.success('Message sent successfully!', {
+      toast.success(t('messageSent'), {
         description: `Thank you ${name}, we'll get back to you soon.`,
         action: {
           label: 'View',
@@ -450,7 +453,7 @@ function ServerActionToastExample() {
       (document.getElementById('server-form') as HTMLFormElement)?.reset();
 
     } catch (error: any) {
-      toast.error('Failed to send message', {
+      toast.error(t('failedToSend'), {
         description: error.message,
         action: {
           label: 'Retry',
@@ -465,15 +468,15 @@ function ServerActionToastExample() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Server Action with Toast</CardTitle>
+        <CardTitle>{t('serverActionToast')}</CardTitle>
         <CardDescription>
-          Form submission with server-side processing and toast feedback
+          {t('serverActionToastDesc')}
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form id="server-form" action={handleServerAction} className="space-y-4">
           <div>
-            <Label htmlFor="name">Name</Label>
+            <Label htmlFor="name">{t('name')}</Label>
             <Input id="name" name="name" required disabled={isSubmitting} />
           </div>
           
@@ -483,12 +486,12 @@ function ServerActionToastExample() {
           </div>
           
           <div>
-            <Label htmlFor="message">Message</Label>
+            <Label htmlFor="message">{t('message')}</Label>
             <Textarea id="message" name="message" required disabled={isSubmitting} />
           </div>
           
           <Button type="submit" disabled={isSubmitting} className="w-full">
-            {isSubmitting ? 'Sending...' : 'Send Message'}
+            {isSubmitting ? t('sending') : t('sendMessage')}
           </Button>
         </form>
       </CardContent>
@@ -497,6 +500,8 @@ function ServerActionToastExample() {
 }
 
 export default function NotificationsPage() {
+  const t = useTranslations('notifications');
+  
   return (
     <div className="min-h-screen">
       {/* Header */}
@@ -504,11 +509,11 @@ export default function NotificationsPage() {
         <div className="container mx-auto px-4 py-12 md:py-16">
           <div className="max-w-3xl">
             <Badge variant="secondary" className="mb-4 text-xs tracking-wider uppercase">
-              UI/UX
+              {t('badge')}
             </Badge>
-            <h1 className="mb-4">Toast Notifications</h1>
+            <h1 className="mb-4">{t('title')}</h1>
             <p className="text-lg text-muted-foreground leading-relaxed">
-              Learn Sonner integration and custom notification systems for both client and server components.
+              {t('description')}
             </p>
             <div className="w-12 h-1 bg-accent mt-6" />
           </div>
@@ -523,10 +528,10 @@ export default function NotificationsPage() {
             <span className="hidden sm:inline">Pourquoi/Quand</span>
             <span className="sm:hidden">?</span>
           </TabsTrigger>
-          <TabsTrigger value="basics">Basics</TabsTrigger>
-          <TabsTrigger value="sonner">Sonner Examples</TabsTrigger>
-          <TabsTrigger value="custom">Custom Toasts</TabsTrigger>
-          <TabsTrigger value="server">Server Actions</TabsTrigger>
+          <TabsTrigger value="basics">{t('tabs.basics')}</TabsTrigger>
+          <TabsTrigger value="sonner">{t('tabs.sonner')}</TabsTrigger>
+          <TabsTrigger value="custom">{t('tabs.custom')}</TabsTrigger>
+          <TabsTrigger value="server">{t('tabs.server')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="why-when">
@@ -538,10 +543,10 @@ export default function NotificationsPage() {
             <CardHeader>
               <CardTitle className="flex items-center">
                 <Bell className="mr-2 h-5 w-5" />
-                Toast Notifications Overview
+                {t('overview')}
               </CardTitle>
               <CardDescription>
-                User feedback through toast notifications in modern web applications
+                {t('overviewDesc')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -549,28 +554,28 @@ export default function NotificationsPage() {
                 <div className="p-4 border rounded-lg bg-blue-50 dark:bg-blue-950">
                   <div className="flex items-center mb-3">
                     <Bell className="h-5 w-5 text-blue-600 mr-2" />
-                    <h3 className="font-semibold text-blue-800 dark:text-blue-200">Sonner</h3>
+                    <h3 className="font-semibold text-blue-800 dark:text-blue-200">{t('sonnerTitle')}</h3>
                   </div>
                   <ul className="text-sm space-y-1 text-blue-700 dark:text-blue-300">
-                    <li>• Pre-built toast library</li>
-                    <li>• Beautiful animations</li>
-                    <li>• Promise-based toasts</li>
-                    <li>• Action buttons support</li>
-                    <li>• Accessibility built-in</li>
+                    <li>• {t('sonnerFeatures.prebuilt')}</li>
+                    <li>• {t('sonnerFeatures.animations')}</li>
+                    <li>• {t('sonnerFeatures.promises')}</li>
+                    <li>• {t('sonnerFeatures.actions')}</li>
+                    <li>• {t('sonnerFeatures.accessibility')}</li>
                   </ul>
                 </div>
                 
                 <div className="p-4 border rounded-lg bg-green-50 dark:bg-green-950">
                   <div className="flex items-center mb-3">
                     <Settings className="h-5 w-5 text-green-600 mr-2" />
-                    <h3 className="font-semibold text-green-800 dark:text-green-200">Custom Toasts</h3>
+                    <h3 className="font-semibold text-green-800 dark:text-green-200">{t('customToasts')}</h3>
                   </div>
                   <ul className="text-sm space-y-1 text-green-700 dark:text-green-300">
-                    <li>• Full design control</li>
-                    <li>• Custom animations</li>
-                    <li>• Brand-specific styling</li>
-                    <li>• Advanced interactions</li>
-                    <li>• Complex layouts</li>
+                    <li>• {t('customFeatures.control')}</li>
+                    <li>• {t('customFeatures.customAnimations')}</li>
+                    <li>• {t('customFeatures.branding')}</li>
+                    <li>• {t('customFeatures.interactions')}</li>
+                    <li>• {t('customFeatures.layouts')}</li>
                   </ul>
                 </div>
               </div>
@@ -609,43 +614,43 @@ function MyComponent() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Toast Types and Use Cases</CardTitle>
+              <CardTitle>{t('toastTypes')}</CardTitle>
               <CardDescription>
-                When and how to use different types of notifications
+                {t('toastTypesDesc')}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <h3 className="font-semibold mb-3 text-green-600">Success Toasts</h3>
+                  <h3 className="font-semibold mb-3 text-green-600">{t('successToasts')}</h3>
                   <ul className="space-y-2 text-sm">
                     <li className="flex items-start">
                       <Badge variant="secondary" className="mr-2 mt-0.5">✓</Badge>
-                      Form submissions completed
+                      {t('successUseCases.formSubmissions')}
                     </li>
                     <li className="flex items-start">
                       <Badge variant="secondary" className="mr-2 mt-0.5">✓</Badge>
-                      Data saved successfully
+                      {t('successUseCases.dataSaved')}
                     </li>
                     <li className="flex items-start">
                       <Badge variant="secondary" className="mr-2 mt-0.5">✓</Badge>
-                      Actions completed
+                      {t('successUseCases.actionsCompleted')}
                     </li>
                     <li className="flex items-start">
                       <Badge variant="secondary" className="mr-2 mt-0.5">✓</Badge>
-                      Settings updated
+                      {t('successUseCases.settingsUpdated')}
                     </li>
                   </ul>
                 </div>
                 
                 <div>
-                  <h3 className="font-semibold mb-3 text-red-600">Error Toasts</h3>
+                  <h3 className="font-semibold mb-3 text-red-600">{t('errorToasts')}</h3>
                   <ul className="space-y-2 text-sm text-muted-foreground">
-                    <li>• Network connection issues</li>
-                    <li>• Validation failures</li>
-                    <li>• Server errors</li>
-                    <li>• Permission denied</li>
-                    <li>• Unexpected failures</li>
+                    <li>• {t('errorUseCases.network')}</li>
+                    <li>• {t('errorUseCases.validation')}</li>
+                    <li>• {t('errorUseCases.server')}</li>
+                    <li>• {t('errorUseCases.permission')}</li>
+                    <li>• {t('errorUseCases.unexpected')}</li>
                   </ul>
                 </div>
               </div>

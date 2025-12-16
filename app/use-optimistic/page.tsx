@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useOptimistic, useTransition } from 'react';
+import { useTranslations } from 'next-intl';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -227,6 +228,7 @@ async function createPost(title: string, content: string): Promise<Post> {
 
 // Simple Chat Example
 function SimpleChatExample() {
+  const t = useTranslations('useOptimistic');
   const [messages, setMessages] = useState<Message[]>([
     {
       id: '1',
@@ -312,10 +314,10 @@ function SimpleChatExample() {
       <CardHeader>
         <CardTitle className="flex items-center">
           <MessageCircle className="mr-2 h-5 w-5" />
-          Chat Simple avec useOptimistic
+          {t('simpleChat')}
         </CardTitle>
         <CardDescription>
-          Les messages apparaissent instantanément avec une mise à jour optimiste
+          {t('simpleChatDesc')}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -364,7 +366,7 @@ function SimpleChatExample() {
           <Input
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
-            placeholder="Tapez votre message..."
+            placeholder={t('typeMessage')}
             disabled={isPending}
             className="flex-1"
           />
@@ -473,10 +475,10 @@ function OptimisticTodoList() {
       <CardHeader>
         <CardTitle className="flex items-center">
           <CheckCircle className="mr-2 h-5 w-5" />
-          Todo List Optimiste
+          {t('todoList')}
         </CardTitle>
         <CardDescription>
-          Actions instantanées avec rollback automatique en cas d'erreur
+          {t('todoListDesc')}
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -485,7 +487,7 @@ function OptimisticTodoList() {
           <Input
             value={newTodo}
             onChange={(e) => setNewTodo(e.target.value)}
-            placeholder="Nouvelle tâche..."
+            placeholder={t('newTask')}
             disabled={isPending}
             className="flex-1"
           />
@@ -522,7 +524,7 @@ function OptimisticTodoList() {
                 </span>
                 {todo.isOptimistic && (
                   <Badge variant="secondary" className="text-xs">
-                    En cours...
+                    {t('inProgress')}
                   </Badge>
                 )}
               </div>
@@ -543,7 +545,7 @@ function OptimisticTodoList() {
         {optimisticTodos.length === 0 && (
           <div className="text-center py-8 text-gray-500">
             <CheckCircle className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-            <p>Aucune tâche. Ajoutez-en une !</p>
+            <p>{t('noTasks')}</p>
           </div>
         )}
       </CardContent>
@@ -596,7 +598,7 @@ function OptimisticPostForm() {
       try {
         const serverPost = await createPost(formData.title, formData.content);
         setPosts(prev => [serverPost, ...prev]);
-        toast.success('Post créé avec succès !');
+        toast.success(t('postCreated'));
       } catch (error) {
         toast.error((error as Error).message);
         // Restaurer le formulaire en cas d'erreur
@@ -641,32 +643,32 @@ function OptimisticPostForm() {
         <CardHeader>
           <CardTitle className="flex items-center">
             <Edit className="mr-2 h-5 w-5" />
-            Créer un Post
+            {t('createPost')}
           </CardTitle>
           <CardDescription>
-            Le post apparaît instantanément pendant la création
+            {t('createPostDesc')}
           </CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <Label htmlFor="title">Titre</Label>
+              <Label htmlFor="title">{t('title')}</Label>
               <Input
                 id="title"
                 value={formData.title}
                 onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-                placeholder="Titre du post..."
+                placeholder={t('postTitle')}
                 disabled={isPending}
               />
             </div>
             
             <div>
-              <Label htmlFor="content">Contenu</Label>
+              <Label htmlFor="content">{t('content')}</Label>
               <Textarea
                 id="content"
                 value={formData.content}
                 onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
-                placeholder="Contenu du post..."
+                placeholder={t('postContent')}
                 rows={4}
                 disabled={isPending}
               />
@@ -680,12 +682,12 @@ function OptimisticPostForm() {
               {isPending ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Création en cours...
+                  {t('creating')}
                 </>
               ) : (
                 <>
                   <Plus className="h-4 w-4 mr-2" />
-                  Créer le post
+                  {t('create')}
                 </>
               )}
             </Button>
@@ -696,7 +698,7 @@ function OptimisticPostForm() {
       {/* Posts List */}
       <Card>
         <CardHeader>
-          <CardTitle>Posts Récents</CardTitle>
+          <CardTitle>{t('recentPosts')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -724,7 +726,7 @@ function OptimisticPostForm() {
                   {post.isOptimistic && (
                     <Badge variant="secondary" className="flex items-center space-x-1">
                       <Clock className="h-3 w-3" />
-                      <span>En cours...</span>
+                      <span>{t('inProgress')}</span>
                     </Badge>
                   )}
                 </div>
@@ -761,11 +763,11 @@ export default function UseOptimisticPage() {
         <div className="container mx-auto px-4 py-12 md:py-16">
           <div className="max-w-3xl">
             <Badge variant="secondary" className="mb-4 text-xs tracking-wider uppercase">
-              React 19
+              {t('badge')}
             </Badge>
-            <h1 className="mb-4">useOptimistic Hook</h1>
+            <h1 className="mb-4">{t('title')}</h1>
             <p className="text-lg text-muted-foreground leading-relaxed">
-              Créez des interfaces utilisateur réactives avec des mises à jour optimistes qui s&apos;annulent automatiquement en cas d&apos;erreur.
+              {t('description')}
             </p>
             <div className="w-12 h-1 bg-accent mt-6" />
           </div>
@@ -780,10 +782,10 @@ export default function UseOptimisticPage() {
             <span className="hidden sm:inline">Pourquoi/Quand</span>
             <span className="sm:hidden">?</span>
           </TabsTrigger>
-          <TabsTrigger value="basics">Basics</TabsTrigger>
-          <TabsTrigger value="chat">Chat Simple</TabsTrigger>
-          <TabsTrigger value="todos">Todo List</TabsTrigger>
-          <TabsTrigger value="posts">Posts Complexes</TabsTrigger>
+          <TabsTrigger value="basics">{t('tabs.basics')}</TabsTrigger>
+          <TabsTrigger value="chat">{t('tabs.chat')}</TabsTrigger>
+          <TabsTrigger value="todos">{t('tabs.todos')}</TabsTrigger>
+          <TabsTrigger value="posts">{t('tabs.posts')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="why-when">
@@ -795,33 +797,33 @@ export default function UseOptimisticPage() {
             <CardHeader>
               <CardTitle className="flex items-center">
                 <Zap className="mr-2 h-5 w-5" />
-                Qu'est-ce que useOptimistic ?
+                {t('whatIs')}
               </CardTitle>
               <CardDescription>
-                Un hook React pour créer des interfaces utilisateur optimistes
+                {t('whatIsDesc')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid md:grid-cols-3 gap-4">
                 <div className="text-center p-4 border rounded-lg">
                   <Zap className="h-8 w-8 text-blue-600 mx-auto mb-2" />
-                  <h3 className="font-semibold">Réactivité</h3>
+                  <h3 className="font-semibold">{t('reactivity')}</h3>
                   <p className="text-sm text-muted-foreground">
-                    Interface qui répond instantanément
+                    {t('reactivityDesc')}
                   </p>
                 </div>
                 <div className="text-center p-4 border rounded-lg">
                   <CheckCircle className="h-8 w-8 text-green-600 mx-auto mb-2" />
-                  <h3 className="font-semibold">Rollback Auto</h3>
+                  <h3 className="font-semibold">{t('rollback')}</h3>
                   <p className="text-sm text-muted-foreground">
-                    Annulation automatique en cas d'erreur
+                    {t('rollbackDesc')}
                   </p>
                 </div>
                 <div className="text-center p-4 border rounded-lg">
                   <MessageCircle className="h-8 w-8 text-purple-600 mx-auto mb-2" />
-                  <h3 className="font-semibold">UX Améliorée</h3>
+                  <h3 className="font-semibold">{t('uxImproved')}</h3>
                   <p className="text-sm text-muted-foreground">
-                    Expérience utilisateur fluide
+                    {t('uxImprovedDesc')}
                   </p>
                 </div>
               </div>
@@ -878,43 +880,43 @@ function OptimisticComponent() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Concepts Clés</CardTitle>
+              <CardTitle>{t('keyConcepts')}</CardTitle>
               <CardDescription>
-                Comprendre les principes des mises à jour optimistes
+                {t('keyConceptsDesc')}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <h3 className="font-semibold mb-3 text-blue-600">Avantages</h3>
+                  <h3 className="font-semibold mb-3 text-blue-600">{t('advantages')}</h3>
                   <ul className="space-y-2 text-sm">
                     <li className="flex items-start">
                       <Badge variant="secondary" className="mr-2 mt-0.5">✓</Badge>
-                      Interface réactive instantanée
+                      {t('instantInterface')}
                     </li>
                     <li className="flex items-start">
                       <Badge variant="secondary" className="mr-2 mt-0.5">✓</Badge>
-                      Meilleure perception de performance
+                      {t('betterPerformance')}
                     </li>
                     <li className="flex items-start">
                       <Badge variant="secondary" className="mr-2 mt-0.5">✓</Badge>
-                      Rollback automatique des erreurs
+                      {t('autoRollback')}
                     </li>
                     <li className="flex items-start">
                       <Badge variant="secondary" className="mr-2 mt-0.5">✓</Badge>
-                      Synchronisation état local/serveur
+                      {t('sync')}
                     </li>
                   </ul>
                 </div>
                 
                 <div>
-                  <h3 className="font-semibold mb-3 text-green-600">Cas d'Usage</h3>
+                  <h3 className="font-semibold mb-3 text-green-600">{t('useCases')}</h3>
                   <ul className="space-y-2 text-sm text-muted-foreground">
-                    <li>• Messages et commentaires</li>
-                    <li>• Likes et réactions</li>
-                    <li>• Todo lists et tâches</li>
-                    <li>• Formulaires de création</li>
-                    <li>• Actions utilisateur fréquentes</li>
+                    <li>• {t('messages')}</li>
+                    <li>• {t('likes')}</li>
+                    <li>• {t('todoLists')}</li>
+                    <li>• {t('forms')}</li>
+                    <li>• {t('frequentActions')}</li>
                   </ul>
                 </div>
               </div>
@@ -1200,32 +1202,32 @@ function OptimisticComponent() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Bonnes Pratiques</CardTitle>
+              <CardTitle>{t('bestPractices')}</CardTitle>
               <CardDescription>
-                Conseils pour utiliser useOptimistic efficacement
+                {t('bestPracticesDesc')}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <h3 className="font-semibold mb-3 text-green-600">✅ À faire</h3>
+                  <h3 className="font-semibold mb-3 text-green-600">{t('do')}</h3>
                   <ul className="space-y-2 text-sm">
-                    <li>• Utiliser avec useTransition</li>
-                    <li>• Indiquer visuellement l'état optimiste</li>
-                    <li>• Gérer les erreurs avec toast/notifications</li>
-                    <li>• Tester les cas d'échec</li>
-                    <li>• Garder les mises à jour simples</li>
+                    <li>• {t('useWithTransition')}</li>
+                    <li>• {t('visualIndication')}</li>
+                    <li>• {t('handleErrors')}</li>
+                    <li>• {t('testFailures')}</li>
+                    <li>• {t('keepSimple')}</li>
                   </ul>
                 </div>
                 
                 <div>
-                  <h3 className="font-semibold mb-3 text-red-600">❌ À éviter</h3>
+                  <h3 className="font-semibold mb-3 text-red-600">{t('avoid')}</h3>
                   <ul className="space-y-2 text-sm text-muted-foreground">
-                    <li>• Mises à jour optimistes complexes</li>
-                    <li>• Oublier la gestion d'erreurs</li>
-                    <li>• Pas d'indication visuelle</li>
-                    <li>• Logique métier dans l'optimisme</li>
-                    <li>• Rollback manuel systématique</li>
+                    <li>• {t('complexUpdates')}</li>
+                    <li>• {t('forgetErrors')}</li>
+                    <li>• {t('noVisual')}</li>
+                    <li>• {t('businessLogic')}</li>
+                    <li>• {t('manualRollback')}</li>
                   </ul>
                 </div>
               </div>

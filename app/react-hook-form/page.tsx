@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -223,6 +224,7 @@ type ProjectFormData = z.infer<typeof projectSchema>;
 // COMPOSANT 1: FORMULAIRE D'INSCRIPTION
 // ============================================
 function SignupForm() {
+  const t = useTranslations('reactHookForm');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -242,8 +244,8 @@ function SignupForm() {
 
   const onSubmit = async (data: SignupFormData) => {
     await new Promise(resolve => setTimeout(resolve, 1500));
-    toast.success("Compte créé avec succès !", {
-      description: `Bienvenue ${data.fullName} !`,
+    toast.success(t('accountCreated'), {
+      description: `${t('welcome')} ${data.fullName} !`,
     });
     console.log("Signup data:", data);
     form.reset();
@@ -270,7 +272,7 @@ function SignupForm() {
           name="fullName"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Nom complet</FormLabel>
+              <FormLabel>{t('fullName')}</FormLabel>
               <FormControl>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -287,7 +289,7 @@ function SignupForm() {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Adresse email</FormLabel>
+              <FormLabel>{t('emailAddress')}</FormLabel>
               <FormControl>
                 <div className="relative">
                   <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -295,7 +297,7 @@ function SignupForm() {
                 </div>
               </FormControl>
               <FormDescription>
-                Nous ne partagerons jamais votre email.
+                {t('weNeverShare')}
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -307,7 +309,7 @@ function SignupForm() {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Mot de passe</FormLabel>
+              <FormLabel>{t('password')}</FormLabel>
               <FormControl>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -343,7 +345,7 @@ function SignupForm() {
                     ))}
                   </div>
                   <p className="text-xs text-muted-foreground">
-                    Force : {passwordStrength <= 2 ? 'Faible' : passwordStrength <= 3 ? 'Moyen' : 'Fort'}
+                    {t('passwordStrength')} {passwordStrength <= 2 ? t('weak') : passwordStrength <= 3 ? t('medium') : t('strong')}
                   </p>
                 </div>
               )}
@@ -357,7 +359,7 @@ function SignupForm() {
           name="confirmPassword"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Confirmer le mot de passe</FormLabel>
+              <FormLabel>{t('confirmPassword')}</FormLabel>
               <FormControl>
                 <div className="relative">
                   <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -398,7 +400,7 @@ function SignupForm() {
               </FormControl>
               <div className="space-y-1 leading-none">
                 <FormLabel className="font-normal">
-                  J'accepte les <a href="#" className="text-primary underline">conditions d'utilisation</a> et la <a href="#" className="text-primary underline">politique de confidentialité</a>
+                  J'accepte les <a href="#" className="text-primary underline">{t('acceptTermsLink')}</a> et la <a href="#" className="text-primary underline">{t('privacyPolicy')}</a>
                 </FormLabel>
                 <FormMessage />
               </div>
@@ -419,7 +421,7 @@ function SignupForm() {
               </FormControl>
               <div className="space-y-1 leading-none">
                 <FormLabel className="font-normal">
-                  Recevoir les actualités et offres par email
+                  {t('receiveNews')}
                 </FormLabel>
               </div>
             </FormItem>
@@ -430,10 +432,10 @@ function SignupForm() {
           {form.formState.isSubmitting ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Création en cours...
+              {t('creatingAccount')}
             </>
           ) : (
-            "Créer mon compte"
+            t('createAccount')
           )}
         </Button>
       </form>
@@ -445,6 +447,7 @@ function SignupForm() {
 // COMPOSANT 2: FORMULAIRE DE CHECKOUT
 // ============================================
 function CheckoutForm() {
+  const t = useTranslations('reactHookForm');
   const form = useForm<CheckoutFormData>({
     resolver: zodResolver(checkoutSchema),
     defaultValues: {
@@ -465,8 +468,8 @@ function CheckoutForm() {
 
   const onSubmit = async (data: CheckoutFormData) => {
     await new Promise(resolve => setTimeout(resolve, 2000));
-    toast.success("Commande confirmée !", {
-      description: "Vous recevrez un email de confirmation.",
+    toast.success(t('orderConfirmed'), {
+      description: t('confirmationEmail'),
     });
     console.log("Checkout data:", data);
   };
@@ -478,7 +481,7 @@ function CheckoutForm() {
         <div className="space-y-4">
           <h3 className="text-lg font-semibold flex items-center gap-2">
             <Mail className="h-5 w-5" />
-            Informations de contact
+            {t('contactInfo')}
           </h3>
 
           <div className="grid md:grid-cols-2 gap-4">
@@ -501,7 +504,7 @@ function CheckoutForm() {
               name="phone"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Téléphone</FormLabel>
+                  <FormLabel>{t('phone')}</FormLabel>
                   <FormControl>
                     <div className="relative">
                       <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -521,7 +524,7 @@ function CheckoutForm() {
         <div className="space-y-4">
           <h3 className="text-lg font-semibold flex items-center gap-2">
             <MapPin className="h-5 w-5" />
-            Adresse de livraison
+            {t('shippingAddress')}
           </h3>
 
           <div className="grid md:grid-cols-2 gap-4">
@@ -530,7 +533,7 @@ function CheckoutForm() {
               name="shipping.firstName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Prénom</FormLabel>
+                  <FormLabel>{t('firstName')}</FormLabel>
                   <FormControl>
                     <Input placeholder="Jean" {...field} />
                   </FormControl>
@@ -544,7 +547,7 @@ function CheckoutForm() {
               name="shipping.lastName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nom</FormLabel>
+                  <FormLabel>{t('lastName')}</FormLabel>
                   <FormControl>
                     <Input placeholder="Dupont" {...field} />
                   </FormControl>
@@ -559,7 +562,7 @@ function CheckoutForm() {
             name="shipping.address"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Adresse</FormLabel>
+                <FormLabel>{t('address')}</FormLabel>
                 <FormControl>
                   <Input placeholder="123 rue de la Paix" {...field} />
                 </FormControl>
@@ -574,7 +577,7 @@ function CheckoutForm() {
               name="shipping.city"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Ville</FormLabel>
+                  <FormLabel>{t('city')}</FormLabel>
                   <FormControl>
                     <Input placeholder="Paris" {...field} />
                   </FormControl>
@@ -588,7 +591,7 @@ function CheckoutForm() {
               name="shipping.postalCode"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Code postal</FormLabel>
+                  <FormLabel>{t('postalCode')}</FormLabel>
                   <FormControl>
                     <Input placeholder="75001" {...field} />
                   </FormControl>
@@ -602,11 +605,11 @@ function CheckoutForm() {
               name="shipping.country"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Pays</FormLabel>
+                  <FormLabel>{t('country')}</FormLabel>
                   <Select onValueChange={field.onChange} defaultValue={field.value}>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder="Sélectionner" />
+                        <SelectValue placeholder={t('select')} />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
@@ -631,16 +634,16 @@ function CheckoutForm() {
           name="deliveryNotes"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Instructions de livraison (optionnel)</FormLabel>
+              <FormLabel>{t('deliveryInstructions')}</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder="Code d'entrée, étage, instructions particulières..."
+                  placeholder={t('deliveryPlaceholder')}
                   className="resize-none"
                   {...field}
                 />
               </FormControl>
               <FormDescription>
-                Ces informations seront transmises au livreur.
+                {t('deliveryInfo')}
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -660,7 +663,7 @@ function CheckoutForm() {
               </FormControl>
               <div className="space-y-1 leading-none">
                 <FormLabel>
-                  Adresse de facturation identique à l'adresse de livraison
+                  {t('billingSameAsShipping')}
                 </FormLabel>
               </div>
             </FormItem>
@@ -671,12 +674,12 @@ function CheckoutForm() {
           {form.formState.isSubmitting ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Traitement en cours...
+              {t('processing')}
             </>
           ) : (
             <>
               <CreditCard className="mr-2 h-4 w-4" />
-              Procéder au paiement
+              {t('proceedToPayment')}
             </>
           )}
         </Button>
@@ -689,6 +692,7 @@ function CheckoutForm() {
 // COMPOSANT 3: CRÉATION DE PROJET (GitHub-like)
 // ============================================
 function ProjectForm() {
+  const t = useTranslations('reactHookForm');
   const form = useForm<ProjectFormData>({
     resolver: zodResolver(projectSchema),
     defaultValues: {
@@ -711,7 +715,7 @@ function ProjectForm() {
 
   const onSubmit = async (data: ProjectFormData) => {
     await new Promise(resolve => setTimeout(resolve, 1500));
-    toast.success(`Projet "${data.name}" créé !`, {
+    toast.success(t('projectCreated'), {
       description: `Visibilité : ${data.visibility}`,
     });
     console.log("Project data:", data);
@@ -725,7 +729,7 @@ function ProjectForm() {
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Nom du projet</FormLabel>
+              <FormLabel>{t('projectName')}</FormLabel>
               <FormControl>
                 <Input placeholder="mon-super-projet" {...field} />
               </FormControl>
@@ -748,16 +752,16 @@ function ProjectForm() {
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Description (optionnel)</FormLabel>
+              <FormLabel>{t('projectDescription')}</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder="Une brève description de votre projet..."
+                  placeholder={t('briefDescription')}
                   className="resize-none"
                   {...field}
                 />
               </FormControl>
               <FormDescription>
-                {field.value?.length || 0}/200 caractères
+                {field.value?.length || 0}/200 {t('characters')}
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -770,22 +774,22 @@ function ProjectForm() {
             name="visibility"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Visibilité</FormLabel>
+                <FormLabel>{t('visibility')}</FormLabel>
                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="Sélectionner" />
+                      <SelectValue placeholder={t('select')} />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
                     <SelectItem value="public">
                       <div className="flex items-center gap-2">
-                        <span>🌍</span> Public
+                        <span>🌍</span> {t('public')}
                       </div>
                     </SelectItem>
                     <SelectItem value="private">
                       <div className="flex items-center gap-2">
-                        <span>🔒</span> Privé
+                        <span>🔒</span> {t('private')}
                       </div>
                     </SelectItem>
                   </SelectContent>
@@ -800,11 +804,11 @@ function ProjectForm() {
             name="framework"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Framework</FormLabel>
+                <FormLabel>{t('framework')}</FormLabel>
                 <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="Choisir un framework" />
+                      <SelectValue placeholder={t('chooseFramework')} />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
@@ -826,7 +830,7 @@ function ProjectForm() {
         {/* Features dynamiques avec useFieldArray */}
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <FormLabel>Features à implémenter</FormLabel>
+            <FormLabel>{t('featuresToImplement')}</FormLabel>
             <Button
               type="button"
               variant="outline"
@@ -834,13 +838,13 @@ function ProjectForm() {
               onClick={() => append({ name: "", priority: "medium" })}
             >
               <Plus className="h-4 w-4 mr-1" />
-              Ajouter
+              {t('add')}
             </Button>
           </div>
 
           {fields.length === 0 && (
             <p className="text-sm text-muted-foreground text-center py-4 border border-dashed rounded-lg">
-              Aucune feature ajoutée. Cliquez sur "Ajouter" pour commencer.
+              {t('noFeatures')}
             </p>
           )}
 
@@ -851,7 +855,7 @@ function ProjectForm() {
                 name={`features.${index}.name`}
                 render={({ field }) => (
                   <FormItem className="flex-1">
-                    {index === 0 && <FormLabel>Nom</FormLabel>}
+                    {index === 0 && <FormLabel>{t('name')}</FormLabel>}
                     <FormControl>
                       <Input placeholder="Authentification, API, etc." {...field} />
                     </FormControl>
@@ -865,7 +869,7 @@ function ProjectForm() {
                 name={`features.${index}.priority`}
                 render={({ field }) => (
                   <FormItem className="w-32">
-                    {index === 0 && <FormLabel>Priorité</FormLabel>}
+                    {index === 0 && <FormLabel>{t('priority')}</FormLabel>}
                     <Select onValueChange={field.onChange} defaultValue={field.value}>
                       <FormControl>
                         <SelectTrigger>
@@ -873,9 +877,9 @@ function ProjectForm() {
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        <SelectItem value="low">Basse</SelectItem>
-                        <SelectItem value="medium">Moyenne</SelectItem>
-                        <SelectItem value="high">Haute</SelectItem>
+                        <SelectItem value="low">{t('low')}</SelectItem>
+                        <SelectItem value="medium">{t('medium')}</SelectItem>
+                        <SelectItem value="high">{t('high')}</SelectItem>
                       </SelectContent>
                     </Select>
                   </FormItem>
@@ -899,7 +903,7 @@ function ProjectForm() {
 
         {/* Options */}
         <div className="space-y-4">
-          <FormLabel>Options</FormLabel>
+          <FormLabel>{t('options')}</FormLabel>
 
           <FormField
             control={form.control}
@@ -914,10 +918,10 @@ function ProjectForm() {
                 </FormControl>
                 <div className="space-y-1 leading-none">
                   <FormLabel className="font-normal">
-                    Ajouter un fichier README.md
+                    {t('addReadme')}
                   </FormLabel>
                   <FormDescription>
-                    Décrit votre projet et comment l'utiliser
+                    {t('readmeDesc')}
                   </FormDescription>
                 </div>
               </FormItem>
@@ -937,10 +941,10 @@ function ProjectForm() {
                 </FormControl>
                 <div className="space-y-1 leading-none">
                   <FormLabel className="font-normal">
-                    Ajouter un fichier .gitignore
+                    {t('addGitignore')}
                   </FormLabel>
                   <FormDescription>
-                    Exclut node_modules, .env, etc.
+                    {t('gitignoreDesc')}
                   </FormDescription>
                 </div>
               </FormItem>
@@ -952,12 +956,12 @@ function ProjectForm() {
           {form.formState.isSubmitting ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Création en cours...
+              {t('creatingProject')}
             </>
           ) : (
             <>
               <Building className="mr-2 h-4 w-4" />
-              Créer le projet
+              {t('createProject')}
             </>
           )}
         </Button>
@@ -977,12 +981,11 @@ export default function ReactHookFormPage() {
         <div className="container mx-auto px-4 py-12 md:py-16">
           <div className="max-w-3xl">
             <Badge variant="secondary" className="mb-4 text-xs tracking-wider uppercase">
-              Forms
+              {t('badge')}
             </Badge>
-            <h1 className="mb-4">React Hook Form + shadcn/ui</h1>
+            <h1 className="mb-4">{t('title')}</h1>
             <p className="text-lg text-muted-foreground leading-relaxed">
-              Créez des formulaires accessibles, performants et maintenables avec React Hook Form,
-              Zod et les composants Form de shadcn/ui.
+              {t('description')}
             </p>
             <div className="w-12 h-1 bg-accent mt-6" />
           </div>
@@ -999,19 +1002,19 @@ export default function ReactHookFormPage() {
             </TabsTrigger>
             <TabsTrigger value="signup">
               <UserCircle className="h-4 w-4 mr-1 hidden sm:inline" />
-              Inscription
+              {t('tabs.signup')}
             </TabsTrigger>
             <TabsTrigger value="checkout">
               <ShoppingCart className="h-4 w-4 mr-1 hidden sm:inline" />
-              Checkout
+              {t('tabs.checkout')}
             </TabsTrigger>
             <TabsTrigger value="project">
               <Building className="h-4 w-4 mr-1 hidden sm:inline" />
-              Projet
+              {t('tabs.project')}
             </TabsTrigger>
             <TabsTrigger value="code">
               <Settings className="h-4 w-4 mr-1 hidden sm:inline" />
-              Code
+              {t('tabs.code')}
             </TabsTrigger>
           </TabsList>
 
@@ -1024,11 +1027,10 @@ export default function ReactHookFormPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <UserCircle className="h-5 w-5" />
-                  Formulaire d'inscription
+                  {t('signupForm')}
                 </CardTitle>
                 <CardDescription>
-                  Comme sur GitHub, Stripe, ou Vercel - avec validation en temps réel,
-                  force du mot de passe, et gestion des CGU.
+                  {t('signupFormDesc')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -1042,11 +1044,10 @@ export default function ReactHookFormPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <ShoppingCart className="h-5 w-5" />
-                  Formulaire de checkout
+                  {t('checkoutForm')}
                 </CardTitle>
                 <CardDescription>
-                  Comme sur Amazon ou Stripe - informations de contact,
-                  adresse de livraison, et options de facturation.
+                  {t('checkoutFormDesc')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -1060,11 +1061,10 @@ export default function ReactHookFormPage() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Building className="h-5 w-5" />
-                  Création de projet
+                  {t('projectForm')}
                 </CardTitle>
                 <CardDescription>
-                  Comme sur GitHub ou Vercel - nom, description, visibilité,
-                  et features dynamiques avec useFieldArray.
+                  {t('projectFormDesc')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -1075,38 +1075,38 @@ export default function ReactHookFormPage() {
 
           <TabsContent value="code" className="space-y-6">
             <Card>
-              <CardHeader>
-                <CardTitle>Structure de base avec shadcn/ui Form</CardTitle>
-                <CardDescription>
-                  La façon recommandée de créer des formulaires accessibles
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid md:grid-cols-3 gap-4">
-                  <div className="text-center p-4 border rounded-lg">
-                    <CheckCircle className="h-8 w-8 text-green-600 mx-auto mb-2" />
-                    <h3 className="font-semibold">Accessibilité</h3>
-                    <p className="text-sm text-muted-foreground">
-                      ARIA automatique, IDs uniques
-                    </p>
-                  </div>
-                  <div className="text-center p-4 border rounded-lg">
-                    <FormInput className="h-8 w-8 text-blue-600 mx-auto mb-2" />
-                    <h3 className="font-semibold">Composable</h3>
-                    <p className="text-sm text-muted-foreground">
-                      FormField, FormItem, FormControl
-                    </p>
-                  </div>
-                  <div className="text-center p-4 border rounded-lg">
-                    <AlertCircle className="h-8 w-8 text-orange-600 mx-auto mb-2" />
-                    <h3 className="font-semibold">Erreurs</h3>
-                    <p className="text-sm text-muted-foreground">
-                      FormMessage automatique
-                    </p>
-                  </div>
+            <CardHeader>
+              <CardTitle>{t('baseStructure')}</CardTitle>
+              <CardDescription>
+                {t('baseStructureDesc')}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid md:grid-cols-3 gap-4">
+                <div className="text-center p-4 border rounded-lg">
+                  <CheckCircle className="h-8 w-8 text-green-600 mx-auto mb-2" />
+                  <h3 className="font-semibold">{t('accessibility')}</h3>
+                  <p className="text-sm text-muted-foreground">
+                    {t('accessibilityDesc')}
+                  </p>
                 </div>
-              </CardContent>
-            </Card>
+                <div className="text-center p-4 border rounded-lg">
+                  <FormInput className="h-8 w-8 text-blue-600 mx-auto mb-2" />
+                  <h3 className="font-semibold">{t('composable')}</h3>
+                  <p className="text-sm text-muted-foreground">
+                    {t('composableDesc')}
+                  </p>
+                </div>
+                <div className="text-center p-4 border rounded-lg">
+                  <AlertCircle className="h-8 w-8 text-orange-600 mx-auto mb-2" />
+                  <h3 className="font-semibold">{t('errors')}</h3>
+                  <p className="text-sm text-muted-foreground">
+                    {t('errorsDesc')}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
             <CodeExample
               title="Structure de base avec shadcn/ui Form"

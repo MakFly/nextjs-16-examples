@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -122,6 +123,7 @@ const serverActionsWhyWhen = {
 
 // Client components for demonstrations
 function SimpleActionForm() {
+  const t = useTranslations('serverActions.form');
   const [isPending, setIsPending] = useState(false);
 
   const handleSubmit = async (formData: FormData) => {
@@ -132,10 +134,10 @@ function SimpleActionForm() {
       await new Promise(resolve => setTimeout(resolve, 300));
       
       if (!name || name.length < 2) {
-        throw new Error('Name must be at least 2 characters long');
+        throw new Error(t('nameMinLength'));
       }
       
-      toast.success(`Hello, ${name}! Form submitted successfully.`);
+      toast.success(`${t('hello')} ${name}! ${t('formSubmitted')}`);
     } catch (error: any) {
       toast.error(error.message);
     } finally {
@@ -146,11 +148,11 @@ function SimpleActionForm() {
   return (
     <form action={handleSubmit} className="space-y-4">
       <div>
-        <Label htmlFor="simple-name">Your Name</Label>
+        <Label htmlFor="simple-name">{t('yourName')}</Label>
         <Input
           id="simple-name"
           name="name"
-          placeholder="Enter your name"
+          placeholder={t('enterName')}
           required
           disabled={isPending}
         />
@@ -159,12 +161,12 @@ function SimpleActionForm() {
         {isPending ? (
           <>
             <Spinner className="mr-2" />
-            Processing...
+            {t('processing')}
           </>
         ) : (
           <>
             <Send className="mr-2 h-4 w-4" />
-            Submit
+            {t('submit')}
           </>
         )}
       </Button>
@@ -173,6 +175,7 @@ function SimpleActionForm() {
 }
 
 function ComplexActionForm() {
+  const t = useTranslations('serverActions.form');
   const [isPending, setIsPending] = useState(false);
   const [result, setResult] = useState<any>(null);
 
@@ -222,18 +225,18 @@ function ComplexActionForm() {
     <div className="space-y-6">
       <form id="complex-form" action={handleSubmit} className="space-y-4">
         <div>
-          <Label htmlFor="title">Post Title</Label>
+          <Label htmlFor="title">{t('postTitle')}</Label>
           <Input
             id="title"
             name="title"
-            placeholder="Enter post title"
+            placeholder={t('enterPostTitle')}
             required
             disabled={isPending}
           />
         </div>
         
         <div>
-          <Label htmlFor="category">Category</Label>
+          <Label htmlFor="category">{t('category')}</Label>
           <select
             id="category"
             name="category"
@@ -241,19 +244,19 @@ function ComplexActionForm() {
             required
             disabled={isPending}
           >
-            <option value="">Select a category</option>
-            <option value="technology">Technology</option>
-            <option value="design">Design</option>
-            <option value="business">Business</option>
+            <option value="">{t('selectCategory')}</option>
+            <option value="technology">{t('technology')}</option>
+            <option value="design">{t('design')}</option>
+            <option value="business">{t('business')}</option>
           </select>
         </div>
         
         <div>
-          <Label htmlFor="content">Content</Label>
+          <Label htmlFor="content">{t('content')}</Label>
           <Textarea
             id="content"
             name="content"
-            placeholder="Write your post content..."
+            placeholder={t('writeContent')}
             rows={4}
             required
             disabled={isPending}
@@ -264,12 +267,12 @@ function ComplexActionForm() {
           {isPending ? (
             <>
               <Spinner className="mr-2" />
-              Creating Post...
+              {t('creatingPost')}
             </>
           ) : (
             <>
               <Database className="mr-2 h-4 w-4" />
-              Create Post
+              {t('createPost')}
             </>
           )}
         </Button>
@@ -290,7 +293,7 @@ function ComplexActionForm() {
             <span className={`font-semibold ${
               result.success ? 'text-green-800 dark:text-green-200' : 'text-red-800 dark:text-red-200'
             }`}>
-              {result.success ? 'Success!' : 'Error!'}
+              {result.success ? t('success') : t('error')}
             </span>
           </div>
           <p className={`text-sm ${
@@ -301,12 +304,12 @@ function ComplexActionForm() {
           
           {result.success && result.data && (
             <div className="mt-3 p-3 bg-white dark:bg-gray-800 rounded border">
-              <h4 className="font-semibold text-sm mb-2">Created Post:</h4>
+              <h4 className="font-semibold text-sm mb-2">{t('createdPost')}</h4>
               <div className="text-xs space-y-1">
-                <p><strong>ID:</strong> {result.data.id}</p>
-                <p><strong>Title:</strong> {result.data.title}</p>
-                <p><strong>Category:</strong> {result.data.category}</p>
-                <p><strong>Created:</strong> {new Date(result.data.createdAt).toLocaleString()}</p>
+                <p><strong>{t('id')}</strong> {result.data.id}</p>
+                <p><strong>{t('title')}</strong> {result.data.title}</p>
+                <p><strong>{t('categoryLabel')}</strong> {result.data.category}</p>
+                <p><strong>{t('created')}</strong> {new Date(result.data.createdAt).toLocaleString()}</p>
               </div>
             </div>
           )}
@@ -317,6 +320,8 @@ function ComplexActionForm() {
 }
 
 export default function ServerActionsPage() {
+  const t = useTranslations('serverActions');
+  
   return (
     <div className="min-h-screen">
       {/* Header */}
@@ -324,11 +329,11 @@ export default function ServerActionsPage() {
         <div className="container mx-auto px-4 py-12 md:py-16">
           <div className="max-w-3xl">
             <Badge variant="secondary" className="mb-4 text-xs tracking-wider uppercase">
-              Actions
+              {t('badge')}
             </Badge>
-            <h1 className="mb-4">Server Actions</h1>
+            <h1 className="mb-4">{t('title')}</h1>
             <p className="text-lg text-muted-foreground leading-relaxed">
-              Learn form handling, mutations, and server-side logic with Server Actions.
+              {t('description')}
             </p>
             <div className="w-12 h-1 bg-accent mt-6" />
           </div>
@@ -343,10 +348,10 @@ export default function ServerActionsPage() {
             <span className="hidden sm:inline">Pourquoi/Quand</span>
             <span className="sm:hidden">?</span>
           </TabsTrigger>
-          <TabsTrigger value="basics">Basics</TabsTrigger>
-          <TabsTrigger value="simple">Simple Example</TabsTrigger>
-          <TabsTrigger value="complex">Complex Example</TabsTrigger>
-          <TabsTrigger value="advanced">Advanced</TabsTrigger>
+          <TabsTrigger value="basics">{t('tabs.basics')}</TabsTrigger>
+          <TabsTrigger value="simple">{t('tabs.simple')}</TabsTrigger>
+          <TabsTrigger value="complex">{t('tabs.complex')}</TabsTrigger>
+          <TabsTrigger value="advanced">{t('tabs.advanced')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="why-when">
@@ -358,33 +363,33 @@ export default function ServerActionsPage() {
             <CardHeader>
               <CardTitle className="flex items-center">
                 <Zap className="mr-2 h-5 w-5" />
-                What are Server Actions?
+                {t('whatAre')}
               </CardTitle>
               <CardDescription>
-                Server-side functions that can be called directly from Client Components
+                {t('whatAreDesc')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid md:grid-cols-3 gap-4">
                 <div className="text-center p-4 border rounded-lg">
                   <Shield className="h-8 w-8 text-blue-600 mx-auto mb-2" />
-                  <h3 className="font-semibold">Secure</h3>
+                  <h3 className="font-semibold">{t('secure')}</h3>
                   <p className="text-sm text-muted-foreground">
-                    Run on server, never exposed to client
+                    {t('secureDesc')}
                   </p>
                 </div>
                 <div className="text-center p-4 border rounded-lg">
                   <Database className="h-8 w-8 text-green-600 mx-auto mb-2" />
-                  <h3 className="font-semibold">Direct Access</h3>
+                  <h3 className="font-semibold">{t('directAccess')}</h3>
                   <p className="text-sm text-muted-foreground">
-                    Access databases and APIs directly
+                    {t('directAccessDesc')}
                   </p>
                 </div>
                 <div className="text-center p-4 border rounded-lg">
                   <Zap className="h-8 w-8 text-purple-600 mx-auto mb-2" />
-                  <h3 className="font-semibold">Progressive</h3>
+                  <h3 className="font-semibold">{t('progressive')}</h3>
                   <p className="text-sm text-muted-foreground">
-                    Work without JavaScript enabled
+                    {t('progressiveDesc')}
                   </p>
                 </div>
               </div>
@@ -430,43 +435,43 @@ export function UserForm() {
 
           <Card>
             <CardHeader>
-              <CardTitle>Key Benefits</CardTitle>
+              <CardTitle>{t('keyBenefits')}</CardTitle>
               <CardDescription>
-                Why use Server Actions over traditional API routes
+                {t('keyBenefitsDesc')}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <h3 className="font-semibold mb-3 text-green-600">Advantages</h3>
+                  <h3 className="font-semibold mb-3 text-green-600">{t('advantages')}</h3>
                   <ul className="space-y-2 text-sm">
                     <li className="flex items-start">
                       <Badge variant="secondary" className="mr-2 mt-0.5">✓</Badge>
-                      No API routes needed
+                      {t('noApiRoutes')}
                     </li>
                     <li className="flex items-start">
                       <Badge variant="secondary" className="mr-2 mt-0.5">✓</Badge>
-                      Type-safe by default
+                      {t('typeSafe')}
                     </li>
                     <li className="flex items-start">
                       <Badge variant="secondary" className="mr-2 mt-0.5">✓</Badge>
-                      Progressive enhancement
+                      {t('progressiveEnhancement')}
                     </li>
                     <li className="flex items-start">
                       <Badge variant="secondary" className="mr-2 mt-0.5">✓</Badge>
-                      Automatic revalidation
+                      {t('automaticRevalidation')}
                     </li>
                   </ul>
                 </div>
                 
                 <div>
-                  <h3 className="font-semibold mb-3 text-blue-600">Use Cases</h3>
+                  <h3 className="font-semibold mb-3 text-blue-600">{t('useCases')}</h3>
                   <ul className="space-y-2 text-sm text-muted-foreground">
-                    <li>• Form submissions and mutations</li>
-                    <li>• Database operations (CRUD)</li>
-                    <li>• File uploads and processing</li>
-                    <li>• Email sending and notifications</li>
-                    <li>• Cache revalidation</li>
+                    <li>• {t('formSubmissions')}</li>
+                    <li>• {t('databaseOps')}</li>
+                    <li>• {t('fileUploads')}</li>
+                    <li>• {t('emailSending')}</li>
+                    <li>• {t('cacheRevalidation')}</li>
                   </ul>
                 </div>
               </div>
@@ -477,9 +482,9 @@ export function UserForm() {
         <TabsContent value="simple" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Simple Server Action Demo</CardTitle>
+              <CardTitle>{t('simpleDemo')}</CardTitle>
               <CardDescription>
-                Basic form submission with server-side processing
+                {t('simpleDemoDesc')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -540,9 +545,9 @@ export function SimpleForm() {
         <TabsContent value="complex" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Complex Server Action Demo</CardTitle>
+              <CardTitle>{t('complexDemo')}</CardTitle>
               <CardDescription>
-                Advanced form with validation, error handling, and data processing
+                {t('complexDemoDesc')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -614,9 +619,9 @@ export async function createPost(formData: FormData) {
         <TabsContent value="advanced" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Advanced Patterns</CardTitle>
+              <CardTitle>{t('advancedPatterns')}</CardTitle>
               <CardDescription>
-                Optimistic updates, file uploads, and error handling
+                {t('advancedPatternsDesc')}
               </CardDescription>
             </CardHeader>
             <CardContent>

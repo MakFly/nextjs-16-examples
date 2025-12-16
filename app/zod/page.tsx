@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -114,6 +115,8 @@ const zodWhyWhen = {
 };
 
 export default function ZodPage() {
+  const t = useTranslations('zod');
+  const tForm = useTranslations('common.form');
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -140,7 +143,7 @@ export default function ZodPage() {
       
       userSchema.parse(dataToValidate);
       setErrors({});
-      toast.success('Form validation passed!');
+      toast.success(t('formValidationPassed'));
       return true;
     } catch (error: any) {
       const fieldErrors: Record<string, string> = {};
@@ -152,7 +155,7 @@ export default function ZodPage() {
         });
       }
       setErrors(fieldErrors);
-      toast.error('Form validation failed');
+      toast.error(t('formValidationFailed'));
       return false;
     }
   };
@@ -172,11 +175,11 @@ export default function ZodPage() {
         <div className="container mx-auto px-4 py-12 md:py-16">
           <div className="max-w-3xl">
             <Badge variant="secondary" className="mb-4 text-xs tracking-wider uppercase">
-              Validation
+              {t('badge')}
             </Badge>
-            <h1 className="mb-4">Zod Validation</h1>
+            <h1 className="mb-4">{t('title')}</h1>
             <p className="text-lg text-muted-foreground leading-relaxed">
-              Learn schema validation, form validation, and type safety with Zod.
+              {t('description')}
             </p>
             <div className="w-12 h-1 bg-accent mt-6" />
           </div>
@@ -191,10 +194,10 @@ export default function ZodPage() {
             <span className="hidden sm:inline">Pourquoi/Quand</span>
             <span className="sm:hidden">?</span>
           </TabsTrigger>
-          <TabsTrigger value="basics">Basics</TabsTrigger>
-          <TabsTrigger value="schemas">Schemas</TabsTrigger>
-          <TabsTrigger value="validation">Validation</TabsTrigger>
-          <TabsTrigger value="advanced">Advanced</TabsTrigger>
+          <TabsTrigger value="basics">{t('tabs.basics')}</TabsTrigger>
+          <TabsTrigger value="schemas">{t('tabs.schemas')}</TabsTrigger>
+          <TabsTrigger value="validation">{t('tabs.validation')}</TabsTrigger>
+          <TabsTrigger value="advanced">{t('tabs.advanced')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="why-when">
@@ -206,33 +209,33 @@ export default function ZodPage() {
             <CardHeader>
               <CardTitle className="flex items-center">
                 <Shield className="mr-2 h-5 w-5" />
-                What is Zod?
+                {t('whatIs')}
               </CardTitle>
               <CardDescription>
-                TypeScript-first schema validation with static type inference
+                {t('whatIsDesc')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid md:grid-cols-3 gap-4">
                 <div className="text-center p-4 border rounded-lg">
                   <CheckCircle className="h-8 w-8 text-green-600 mx-auto mb-2" />
-                  <h3 className="font-semibold">Type Safety</h3>
+                  <h3 className="font-semibold">{t('typeSafety')}</h3>
                   <p className="text-sm text-muted-foreground">
-                    Automatic TypeScript type inference
+                    {t('typeSafetyDesc')}
                   </p>
                 </div>
                 <div className="text-center p-4 border rounded-lg">
                   <Shield className="h-8 w-8 text-blue-600 mx-auto mb-2" />
-                  <h3 className="font-semibold">Runtime Validation</h3>
+                  <h3 className="font-semibold">{t('runtimeValidation')}</h3>
                   <p className="text-sm text-muted-foreground">
-                    Validate data at runtime with detailed errors
+                    {t('runtimeValidationDesc')}
                   </p>
                 </div>
                 <div className="text-center p-4 border rounded-lg">
                   <XCircle className="h-8 w-8 text-orange-600 mx-auto mb-2" />
-                  <h3 className="font-semibold">Error Handling</h3>
+                  <h3 className="font-semibold">{t('errorHandling')}</h3>
                   <p className="text-sm text-muted-foreground">
-                    Detailed error messages for debugging
+                    {t('errorHandlingDesc')}
                   </p>
                 </div>
               </div>
@@ -271,9 +274,9 @@ if (result.success) {
         <TabsContent value="schemas" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Schema Types</CardTitle>
+              <CardTitle>{t('schemaTypes')}</CardTitle>
               <CardDescription>
-                Zod supports various data types with validation rules
+                {t('schemaTypesDesc')}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -321,9 +324,9 @@ const nullishSchema = z.string().nullish(); // null | undefined`}
 
           <Card>
             <CardHeader>
-              <CardTitle>Complex Schemas</CardTitle>
+              <CardTitle>{t('complexSchemas')}</CardTitle>
               <CardDescription>
-                Advanced schema patterns for real-world applications
+                {t('complexSchemasDesc')}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -375,16 +378,16 @@ const TransformSchema = z
         <TabsContent value="validation" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Interactive Form Validation</CardTitle>
+              <CardTitle>{t('interactiveForm')}</CardTitle>
               <CardDescription>
-                Try the form below to see Zod validation in action
+                {t('interactiveFormDesc')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-4">
                   <div>
-                    <Label htmlFor="name">Name</Label>
+                    <Label htmlFor="name">{tForm('name')}</Label>
                     <Input
                       id="name"
                       value={formData.name}
@@ -397,7 +400,7 @@ const TransformSchema = z
                   </div>
 
                   <div>
-                    <Label htmlFor="email">Email</Label>
+                    <Label htmlFor="email">{tForm('email')}</Label>
                     <Input
                       id="email"
                       type="email"
@@ -411,7 +414,7 @@ const TransformSchema = z
                   </div>
 
                   <div>
-                    <Label htmlFor="age">Age</Label>
+                    <Label htmlFor="age">{tForm('age')}</Label>
                     <Input
                       id="age"
                       type="number"
@@ -425,7 +428,7 @@ const TransformSchema = z
                   </div>
 
                   <div>
-                    <Label htmlFor="password">Password</Label>
+                    <Label htmlFor="password">{tForm('password')}</Label>
                     <Input
                       id="password"
                       type="password"
@@ -441,7 +444,7 @@ const TransformSchema = z
 
                 <div className="space-y-4">
                   <div>
-                    <Label htmlFor="confirmPassword">Confirm Password</Label>
+                    <Label htmlFor="confirmPassword">{tForm('confirmPassword')}</Label>
                     <Input
                       id="confirmPassword"
                       type="password"
@@ -455,7 +458,7 @@ const TransformSchema = z
                   </div>
 
                   <div>
-                    <Label htmlFor="website">Website (optional)</Label>
+                    <Label htmlFor="website">{tForm('website')} (optionnel)</Label>
                     <Input
                       id="website"
                       value={formData.website}
@@ -469,12 +472,12 @@ const TransformSchema = z
                   </div>
 
                   <div>
-                    <Label htmlFor="bio">Bio (optional)</Label>
+                    <Label htmlFor="bio">{tForm('bio')} (optionnel)</Label>
                     <Textarea
                       id="bio"
                       value={formData.bio}
                       onChange={(e) => handleInputChange('bio', e.target.value)}
-                      placeholder="Tell us about yourself..."
+                      placeholder="Parlez-nous de vous..."
                       className={errors.bio ? 'border-red-500' : ''}
                     />
                     {errors.bio && (
@@ -489,7 +492,7 @@ const TransformSchema = z
                         checked={formData.newsletter}
                         onCheckedChange={(checked) => handleInputChange('newsletter', checked)}
                       />
-                      <Label htmlFor="newsletter">Subscribe to newsletter</Label>
+                      <Label htmlFor="newsletter">{tForm('subscribeToNewsletter')}</Label>
                     </div>
 
                     <div className="flex items-center space-x-2">
@@ -498,7 +501,7 @@ const TransformSchema = z
                         checked={formData.terms}
                         onCheckedChange={(checked) => handleInputChange('terms', checked)}
                       />
-                      <Label htmlFor="terms">I accept the terms and conditions *</Label>
+                      <Label htmlFor="terms">{tForm('acceptTerms')} *</Label>
                     </div>
                     {errors.terms && (
                       <p className="text-red-500 text-sm">{errors.terms}</p>
@@ -508,7 +511,7 @@ const TransformSchema = z
               </div>
 
               <Button onClick={validateForm} className="w-full">
-                Validate Form
+                {t('validateForm')}
               </Button>
             </CardContent>
           </Card>
@@ -517,9 +520,9 @@ const TransformSchema = z
         <TabsContent value="advanced" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Error Handling</CardTitle>
+              <CardTitle>{t('errorHandlingTitle')}</CardTitle>
               <CardDescription>
-                Advanced error handling and custom error messages
+                {t('errorHandlingDesc')}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -566,9 +569,9 @@ const passwordSchema = z.object({
 
           <Card>
             <CardHeader>
-              <CardTitle>Schema Composition</CardTitle>
+              <CardTitle>{t('schemaComposition')}</CardTitle>
               <CardDescription>
-                Combine and extend schemas for reusability
+                {t('schemaCompositionDesc')}
               </CardDescription>
             </CardHeader>
             <CardContent>

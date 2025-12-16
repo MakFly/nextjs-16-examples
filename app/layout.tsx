@@ -10,6 +10,8 @@ import { NextIntlProvider } from '@/components/next-intl-provider';
 // For static export, we'll use a simpler approach
 // The messages will be loaded dynamically client-side
 
+// Note: Metadata cannot use translations directly in static export
+// These will be handled client-side or through static generation
 export const metadata: Metadata = {
   title: 'Next.js 16 Tutorials',
   description: 'A comprehensive tutorial series covering Next.js App Router, React Server Components, Zod, Zustand, TanStack Query, and modern React patterns.',

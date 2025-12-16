@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -236,6 +237,7 @@ const api = {
 
 // Basic Query Example
 function BasicQueryExample() {
+  const t = useTranslations('tanstackQuery');
   const { data: users, isLoading, error, refetch, isFetching } = useQuery({
     queryKey: ['users'],
     queryFn: api.getUsers,
@@ -247,7 +249,7 @@ function BasicQueryExample() {
     return (
       <div className="flex items-center justify-center p-8">
         <Spinner className="h-8 w-8 text-blue-600" />
-        <span className="ml-2">Chargement des utilisateurs...</span>
+        <span className="ml-2">{t('loadingUsers')}</span>
       </div>
     );
   }
@@ -257,11 +259,11 @@ function BasicQueryExample() {
       <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
         <div className="flex items-center">
           <XCircle className="h-5 w-5 text-red-600 mr-2" />
-          <span className="text-red-800">Erreur: {(error as Error).message}</span>
+          <span className="text-red-800">{t('error')} {(error as Error).message}</span>
         </div>
         <Button onClick={() => refetch()} className="mt-3" size="sm">
           <RefreshCw className="h-4 w-4 mr-2" />
-          Réessayer
+          {t('retry')}
         </Button>
       </div>
     );
@@ -270,17 +272,17 @@ function BasicQueryExample() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold">Utilisateurs ({users?.length})</h3>
+        <h3 className="text-lg font-semibold">{t('users')} ({users?.length})</h3>
         <Button onClick={() => refetch()} variant="outline" size="sm" disabled={isFetching}>
           {isFetching ? (
             <>
               <Spinner className="h-4 w-4 mr-2" />
-              Actualisation...
+              {t('refreshing')}
             </>
           ) : (
             <>
               <RefreshCw className="h-4 w-4 mr-2" />
-              Actualiser
+              {t('refresh')}
             </>
           )}
         </Button>
@@ -308,6 +310,7 @@ function BasicQueryExample() {
 
 // Mutation Example
 function MutationExample() {
+  const t = useTranslations('tanstackQuery');
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
   const queryClient = useQueryClient();
@@ -317,12 +320,12 @@ function MutationExample() {
     onSuccess: (newPost) => {
       // Invalidate and refetch posts
       queryClient.invalidateQueries({ queryKey: ['posts'] });
-      toast.success('Post créé avec succès!');
+      toast.success(t('postCreated'));
       setTitle('');
       setBody('');
     },
     onError: (error) => {
-      toast.error(`Erreur: ${(error as Error).message}`);
+      toast.error(`${t('error')} ${(error as Error).message}`);
     },
   });
 
@@ -342,32 +345,32 @@ function MutationExample() {
       <CardHeader>
         <CardTitle className="flex items-center">
           <Plus className="h-5 w-5 mr-2" />
-          Créer un nouveau post
+          {t('createNewPost')}
         </CardTitle>
         <CardDescription>
-          Exemple de mutation avec TanStack Query
+          {t('mutationExample')}
         </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <Label htmlFor="title">Titre</Label>
+            <Label htmlFor="title">{t('title')}</Label>
             <Input
               id="title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              placeholder="Titre du post"
+              placeholder={t('postTitle')}
               disabled={createPostMutation.isPending}
             />
           </div>
           
           <div>
-            <Label htmlFor="body">Contenu</Label>
+            <Label htmlFor="body">{t('content')}</Label>
             <textarea
               id="body"
               value={body}
               onChange={(e) => setBody(e.target.value)}
-              placeholder="Contenu du post"
+              placeholder={t('postContent')}
               className="w-full p-2 border rounded-md"
               rows={4}
               disabled={createPostMutation.isPending}
@@ -382,12 +385,12 @@ function MutationExample() {
             {createPostMutation.isPending ? (
               <>
                 <Spinner className="h-4 w-4 mr-2" />
-                Création...
+                {t('creating')}
               </>
             ) : (
               <>
                 <Plus className="h-4 w-4 mr-2" />
-                Créer le post
+                {t('create')}
               </>
             )}
           </Button>
@@ -397,7 +400,7 @@ function MutationExample() {
           <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-lg">
             <div className="flex items-center">
               <CheckCircle className="h-5 w-5 text-green-600 mr-2" />
-              <span className="text-green-800">Post créé avec succès!</span>
+              <span className="text-green-800">{t('postCreated')}</span>
             </div>
           </div>
         )}
@@ -408,6 +411,7 @@ function MutationExample() {
 
 // Infinite Query Example
 function InfiniteQueryExample() {
+  const t = useTranslations('tanstackQuery');
   const {
     data,
     fetchNextPage,
@@ -428,7 +432,7 @@ function InfiniteQueryExample() {
     return (
       <div className="flex items-center justify-center p-8">
         <Spinner className="h-8 w-8 text-blue-600" />
-        <span className="ml-2">Chargement des posts...</span>
+        <span className="ml-2">{t('loadingPosts')}</span>
       </div>
     );
   }
@@ -438,7 +442,7 @@ function InfiniteQueryExample() {
       <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
         <div className="flex items-center">
           <XCircle className="h-5 w-5 text-red-600 mr-2" />
-          <span className="text-red-800">Erreur: {(error as Error).message}</span>
+          <span className="text-red-800">{t('error')} {(error as Error).message}</span>
         </div>
       </div>
     );
@@ -448,7 +452,7 @@ function InfiniteQueryExample() {
 
   return (
     <div className="space-y-4">
-      <h3 className="text-lg font-semibold">Posts avec pagination infinie</h3>
+      <h3 className="text-lg font-semibold">{t('postsInfinitePagination')}</h3>
       
       <div className="space-y-3">
         {posts.map(post => (
@@ -476,10 +480,10 @@ function InfiniteQueryExample() {
             {isFetchingNextPage ? (
               <>
                 <Spinner className="h-4 w-4 mr-2" />
-                Chargement...
+                {t('loading')}
               </>
             ) : (
-              'Charger plus'
+              t('loadMore')
             )}
           </Button>
         </div>
@@ -487,7 +491,7 @@ function InfiniteQueryExample() {
 
       {!hasNextPage && posts.length > 0 && (
         <div className="text-center text-gray-500 py-4">
-          Tous les posts ont été chargés
+          {t('allPostsLoaded')}
         </div>
       )}
     </div>
@@ -496,6 +500,7 @@ function InfiniteQueryExample() {
 
 // Search Example with Debouncing
 function SearchExample() {
+  const t = useTranslations('tanstackQuery');
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
 
@@ -518,14 +523,14 @@ function SearchExample() {
   return (
     <div className="space-y-4">
       <div>
-        <Label htmlFor="search">Rechercher des posts</Label>
+        <Label htmlFor="search">{t('searchPosts')}</Label>
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
           <Input
             id="search"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Tapez au moins 3 caractères..."
+            placeholder={t('typeAtLeast3')}
             className="pl-10"
           />
         </div>
@@ -536,7 +541,7 @@ function SearchExample() {
           {isLoading && (
             <div className="flex items-center p-4">
               <Spinner className="h-4 w-4 mr-2" />
-              <span>Recherche en cours...</span>
+              <span>{t('searching')}</span>
             </div>
           )}
 
@@ -544,7 +549,7 @@ function SearchExample() {
             <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
               <div className="flex items-center">
                 <XCircle className="h-5 w-5 text-red-600 mr-2" />
-                <span className="text-red-800">Erreur: {(error as Error).message}</span>
+                <span className="text-red-800">{t('error')} {(error as Error).message}</span>
               </div>
             </div>
           )}
@@ -552,7 +557,7 @@ function SearchExample() {
           {searchResults && (
             <div className="space-y-3">
               <p className="text-sm text-gray-600">
-                {searchResults.length} résultat(s) trouvé(s) pour "{debouncedQuery}"
+                {searchResults.length} {t('resultsFound')} "{debouncedQuery}"
               </p>
               
               {searchResults.map(post => (
@@ -577,7 +582,7 @@ function SearchExample() {
         <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
           <div className="flex items-center">
             <AlertCircle className="h-5 w-5 text-blue-600 mr-2" />
-            <span className="text-blue-800">Tapez au moins 3 caractères pour rechercher</span>
+            <span className="text-blue-800">{t('typeAtLeast3ToSearch')}</span>
           </div>
         </div>
       )}
@@ -587,6 +592,7 @@ function SearchExample() {
 
 // Cache Management Example
 function CacheManagementExample() {
+  const t = useTranslations('tanstackQuery');
   const queryClient = useQueryClient();
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
 
@@ -624,19 +630,19 @@ function CacheManagementExample() {
       <div className="flex space-x-2">
         <Button onClick={invalidateUsers} variant="outline" size="sm">
           <RefreshCw className="h-4 w-4 mr-2" />
-          Invalider cache utilisateurs
+          {t('invalidateUsersCache')}
         </Button>
         <Button onClick={clearCache} variant="outline" size="sm">
           <Trash2 className="h-4 w-4 mr-2" />
-          Vider tout le cache
+          {t('clearAllCache')}
         </Button>
       </div>
 
       <div className="grid md:grid-cols-2 gap-6">
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Liste des utilisateurs</CardTitle>
-            <CardDescription>Survolez pour précharger les détails</CardDescription>
+            <CardTitle className="text-lg">{t('userList')}</CardTitle>
+            <CardDescription>{t('hoverToPrefetch')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-2">
@@ -662,16 +668,16 @@ function CacheManagementExample() {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">Détails de l'utilisateur</CardTitle>
+            <CardTitle className="text-lg">{t('userDetails')}</CardTitle>
             <CardDescription>
-              {selectedUserId ? `Utilisateur #${selectedUserId}` : 'Sélectionnez un utilisateur'}
+              {selectedUserId ? `Utilisateur #${selectedUserId}` : t('selectUser')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             {!selectedUserId && (
               <div className="text-center text-gray-500 py-8">
                 <Users className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-                <p>Cliquez sur un utilisateur pour voir ses détails</p>
+                <p>{t('clickUserForDetails')}</p>
               </div>
             )}
 
@@ -690,15 +696,15 @@ function CacheManagementExample() {
                 
                 <div className="space-y-2">
                   <div className="flex justify-between">
-                    <span className="text-sm font-medium">Téléphone:</span>
+                    <span className="text-sm font-medium">{t('phone')}</span>
                     <span className="text-sm">{selectedUser.phone}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-sm font-medium">Site web:</span>
+                    <span className="text-sm font-medium">{t('website')}</span>
                     <span className="text-sm">{selectedUser.website}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-sm font-medium">Entreprise:</span>
+                    <span className="text-sm font-medium">{t('company')}</span>
                     <span className="text-sm">{selectedUser.company.name}</span>
                   </div>
                 </div>
@@ -713,6 +719,8 @@ function CacheManagementExample() {
 
 // Main component with QueryClient provider
 function TanStackQueryContent() {
+  const t = useTranslations('tanstackQuery');
+  
   return (
     <div className="min-h-screen">
       {/* Header */}
@@ -720,11 +728,11 @@ function TanStackQueryContent() {
         <div className="container mx-auto px-4 py-12 md:py-16">
           <div className="max-w-3xl">
             <Badge variant="secondary" className="mb-4 text-xs tracking-wider uppercase">
-              Data Fetching
+              {t('badge')}
             </Badge>
-            <h1 className="mb-4">TanStack Query</h1>
+            <h1 className="mb-4">{t('title')}</h1>
             <p className="text-lg text-muted-foreground leading-relaxed">
-              Maîtrisez la gestion d&apos;état serveur avec TanStack Query : requêtes, mutations, cache et SSR.
+              {t('description')}
             </p>
             <div className="w-12 h-1 bg-accent mt-6" />
           </div>
@@ -739,12 +747,12 @@ function TanStackQueryContent() {
             <span className="hidden sm:inline">Pourquoi/Quand</span>
             <span className="sm:hidden">?</span>
           </TabsTrigger>
-          <TabsTrigger value="basics">Basics</TabsTrigger>
-          <TabsTrigger value="queries">Queries</TabsTrigger>
-          <TabsTrigger value="mutations">Mutations</TabsTrigger>
-          <TabsTrigger value="infinite">Infinite</TabsTrigger>
-          <TabsTrigger value="cache">Cache</TabsTrigger>
-          <TabsTrigger value="examples">Exemples</TabsTrigger>
+          <TabsTrigger value="basics">{t('tabs.basics')}</TabsTrigger>
+          <TabsTrigger value="queries">{t('tabs.queries')}</TabsTrigger>
+          <TabsTrigger value="mutations">{t('tabs.mutations')}</TabsTrigger>
+          <TabsTrigger value="infinite">{t('tabs.infinite')}</TabsTrigger>
+          <TabsTrigger value="cache">{t('tabs.cache')}</TabsTrigger>
+          <TabsTrigger value="examples">{t('tabs.examples')}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="why-when">
@@ -756,33 +764,33 @@ function TanStackQueryContent() {
             <CardHeader>
               <CardTitle className="flex items-center">
                 <Database className="mr-2 h-5 w-5" />
-                Qu'est-ce que TanStack Query ?
+                {t('whatIs')}
               </CardTitle>
               <CardDescription>
-                Une bibliothèque puissante pour la gestion d'état serveur dans React
+                {t('whatIsDesc')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid md:grid-cols-3 gap-4">
                 <div className="text-center p-4 border rounded-lg">
                   <Zap className="h-8 w-8 text-blue-600 mx-auto mb-2" />
-                  <h3 className="font-semibold">Performance</h3>
+                  <h3 className="font-semibold">{t('performance')}</h3>
                   <p className="text-sm text-muted-foreground">
-                    Cache intelligent et synchronisation automatique
+                    {t('performanceDesc')}
                   </p>
                 </div>
                 <div className="text-center p-4 border rounded-lg">
                   <RefreshCw className="h-8 w-8 text-green-600 mx-auto mb-2" />
-                  <h3 className="font-semibold">Synchronisation</h3>
+                  <h3 className="font-semibold">{t('synchronization')}</h3>
                   <p className="text-sm text-muted-foreground">
-                    Mise à jour automatique des données
+                    {t('synchronizationDesc')}
                   </p>
                 </div>
                 <div className="text-center p-4 border rounded-lg">
                   <Clock className="h-8 w-8 text-purple-600 mx-auto mb-2" />
-                  <h3 className="font-semibold">États de chargement</h3>
+                  <h3 className="font-semibold">{t('loadingStates')}</h3>
                   <p className="text-sm text-muted-foreground">
-                    Gestion native des états loading/error
+                    {t('loadingStatesDesc')}
                   </p>
                 </div>
               </div>
@@ -825,43 +833,43 @@ export default function RootLayout({ children }) {
 
           <Card>
             <CardHeader>
-              <CardTitle>Concepts clés</CardTitle>
+              <CardTitle>{t('keyConcepts')}</CardTitle>
               <CardDescription>
-                Les concepts fondamentaux de TanStack Query
+                {t('keyConceptsDesc')}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <h3 className="font-semibold mb-3 text-blue-600">Queries</h3>
+                  <h3 className="font-semibold mb-3 text-blue-600">{t('queries')}</h3>
                   <ul className="space-y-2 text-sm">
                     <li className="flex items-start">
                       <Badge variant="secondary" className="mr-2 mt-0.5">✓</Badge>
-                      Récupération de données depuis le serveur
+                      {t('queriesDesc')}
                     </li>
                     <li className="flex items-start">
                       <Badge variant="secondary" className="mr-2 mt-0.5">✓</Badge>
-                      Cache automatique et invalidation
+                      {t('automaticCache')}
                     </li>
                     <li className="flex items-start">
                       <Badge variant="secondary" className="mr-2 mt-0.5">✓</Badge>
-                      États de chargement et d'erreur
+                      {t('loadingErrorStates')}
                     </li>
                     <li className="flex items-start">
                       <Badge variant="secondary" className="mr-2 mt-0.5">✓</Badge>
-                      Refetch automatique
+                      {t('automaticRefetch')}
                     </li>
                   </ul>
                 </div>
                 
                 <div>
-                  <h3 className="font-semibold mb-3 text-green-600">Mutations</h3>
+                  <h3 className="font-semibold mb-3 text-green-600">{t('mutations')}</h3>
                   <ul className="space-y-2 text-sm text-muted-foreground">
-                    <li>• Création, mise à jour, suppression</li>
-                    <li>• Invalidation optimiste du cache</li>
-                    <li>• Gestion des erreurs et retry</li>
-                    <li>• Callbacks de succès/erreur</li>
-                    <li>• États de chargement</li>
+                    <li>• {t('mutationsDesc')}</li>
+                    <li>• {t('optimisticInvalidation')}</li>
+                    <li>• {t('errorRetry')}</li>
+                    <li>• {t('callbacks')}</li>
+                    <li>• {t('mutationLoadingStates')}</li>
                   </ul>
                 </div>
               </div>
@@ -872,9 +880,9 @@ export default function RootLayout({ children }) {
         <TabsContent value="queries" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Exemple de Query basique</CardTitle>
+              <CardTitle>{t('basicQueryExample')}</CardTitle>
               <CardDescription>
-                Récupération et affichage de données avec gestion des états
+                {t('basicQueryExampleDesc')}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -884,9 +892,9 @@ export default function RootLayout({ children }) {
 
           <Card>
             <CardHeader>
-              <CardTitle>Recherche avec debouncing</CardTitle>
+              <CardTitle>{t('searchWithDebounce')}</CardTitle>
               <CardDescription>
-                Exemple de recherche optimisée avec délai
+                {t('searchWithDebounceDesc')}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -1026,9 +1034,9 @@ function TodoItem({ todo }) {
         <TabsContent value="infinite" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Pagination infinie</CardTitle>
+              <CardTitle>{t('infinitePagination')}</CardTitle>
               <CardDescription>
-                Chargement progressif de données avec useInfiniteQuery
+                {t('infinitePaginationDesc')}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -1102,9 +1110,9 @@ function PostsList() {
         <TabsContent value="cache" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Gestion du cache</CardTitle>
+              <CardTitle>{t('cacheManagement')}</CardTitle>
               <CardDescription>
-                Préchargement, invalidation et manipulation du cache
+                {t('cacheManagementDesc')}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -1188,9 +1196,9 @@ function CacheManager() {
         <TabsContent value="examples" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Exemples Avancés</CardTitle>
+              <CardTitle>{t('advancedExamples')}</CardTitle>
               <CardDescription>
-                Découvrez des exemples concrets de recherche et SSR
+                {t('advancedExamplesDesc')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -1198,21 +1206,21 @@ function CacheManager() {
                 <div className="p-6 border rounded-lg hover:shadow-lg transition-shadow">
                   <div className="flex items-center mb-4">
                     <Search className="h-6 w-6 text-blue-600 mr-2" />
-                    <h3 className="text-lg font-semibold">Recherche Avancée</h3>
+                    <h3 className="text-lg font-semibold">{t('advancedSearch')}</h3>
                   </div>
                   <div className="space-y-2 text-sm mb-4">
-                    <p><strong>Fonctionnalités :</strong></p>
+                    <p><strong>{t('features')}</strong></p>
                     <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-                      <li>Recherche simple avec debouncing</li>
-                      <li>Filtres multiples et dynamiques</li>
-                      <li>Requêtes parallèles avec useQueries</li>
-                      <li>Gestion d'état avancée</li>
-                      <li>Interface utilisateur réactive</li>
+                      <li>{t('simpleSearch')}</li>
+                      <li>{t('multipleFilters')}</li>
+                      <li>{t('parallelQueries')}</li>
+                      <li>{t('advancedState')}</li>
+                      <li>{t('reactiveUI')}</li>
                     </ul>
                   </div>
                   <Button className="w-full" asChild>
                     <Link href="/tanstack-query/search-example">
-                      Voir l'exemple
+                      {t('viewExample')}
                       <ExternalLink className="ml-2 h-4 w-4" />
                     </Link>
                   </Button>
@@ -1221,21 +1229,21 @@ function CacheManager() {
                 <div className="p-6 border rounded-lg hover:shadow-lg transition-shadow">
                   <div className="flex items-center mb-4">
                     <Database className="h-6 w-6 text-green-600 mr-2" />
-                    <h3 className="text-lg font-semibold">Recherche SSR</h3>
+                    <h3 className="text-lg font-semibold">{t('ssrSearch')}</h3>
                   </div>
                   <div className="space-y-2 text-sm mb-4">
-                    <p><strong>Fonctionnalités :</strong></p>
+                    <p><strong>{t('features')}</strong></p>
                     <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-                      <li>Préchargement côté serveur</li>
-                      <li>Synchronisation avec l'URL</li>
-                      <li>Hydratation optimisée</li>
-                      <li>SEO et performance améliorés</li>
-                      <li>Filtres persistants</li>
+                      <li>{t('serverPrefetch')}</li>
+                      <li>{t('urlSync')}</li>
+                      <li>{t('optimizedHydration')}</li>
+                      <li>{t('improvedSeo')}</li>
+                      <li>{t('persistentFilters')}</li>
                     </ul>
                   </div>
                   <Button className="w-full" asChild>
                     <Link href="/tanstack-query/ssr-search">
-                      Voir l'exemple SSR
+                      {t('viewSsrExample')}
                       <ExternalLink className="ml-2 h-4 w-4" />
                     </Link>
                   </Button>
@@ -1244,21 +1252,21 @@ function CacheManager() {
                 <div className="p-6 border rounded-lg hover:shadow-lg transition-shadow">
                   <div className="flex items-center mb-4">
                     <Zap className="h-6 w-6 text-purple-600 mr-2" />
-                    <h3 className="text-lg font-semibold">SSR vs Client</h3>
+                    <h3 className="text-lg font-semibold">{t('ssrVsClient')}</h3>
                   </div>
                   <div className="space-y-2 text-sm mb-4">
-                    <p><strong>Fonctionnalités :</strong></p>
+                    <p><strong>{t('features')}</strong></p>
                     <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-                      <li>Comparaison directe SSR/Client</li>
-                      <li>Données préchargées et mises en cache</li>
-                      <li>Métriques de performance</li>
-                      <li>Exemples concrets avec JSONPlaceholder</li>
-                      <li>Analyse des avantages/inconvénients</li>
+                      <li>{t('directComparison')}</li>
+                      <li>{t('prefetchedCached')}</li>
+                      <li>{t('performanceMetrics')}</li>
+                      <li>{t('concreteExamples')}</li>
+                      <li>{t('analysis')}</li>
                     </ul>
                   </div>
                   <Button className="w-full" asChild>
                     <Link href="/tanstack-query/ssr-vs-client">
-                      Voir la comparaison
+                      {t('viewComparison')}
                       <ExternalLink className="ml-2 h-4 w-4" />
                     </Link>
                   </Button>
@@ -1268,26 +1276,25 @@ function CacheManager() {
               <div className="bg-blue-50 dark:bg-blue-950 p-6 rounded-lg">
                 <h4 className="font-semibold mb-2 flex items-center">
                   <ExternalLink className="h-5 w-5 mr-2" />
-                  Exemples pratiques
+                  {t('practicalExamples')}
                 </h4>
                 <p className="text-sm text-muted-foreground mb-4">
-                  Ces exemples démontrent des patterns réels d'utilisation de TanStack Query 
-                  avec des cas d'usage concrets et du code production-ready.
+                  {t('practicalExamplesDesc')}
                 </p>
                 <div className="grid md:grid-cols-3 gap-4">
                   <Button variant="outline" asChild>
                     <Link href="/tanstack-query/search-example">
-                      Recherche Client-Side
+                      {t('clientSideSearch')}
                     </Link>
                   </Button>
                   <Button variant="outline" asChild>
                     <Link href="/tanstack-query/ssr-search">
-                      Recherche avec SSR
+                      {t('searchWithSsr')}
                     </Link>
                   </Button>
                   <Button variant="outline" asChild>
                     <Link href="/tanstack-query/ssr-vs-client">
-                      Comparaison SSR/Client
+                      {t('ssrClientComparison')}
                     </Link>
                   </Button>
                 </div>
