@@ -9,17 +9,117 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { CodeExample } from '@/components/code-example';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Bell, 
-  CheckCircle, 
-  AlertCircle, 
-  Info, 
+import { WhyWhenTabs } from '@/components/why-when-tabs';
+import {
+  Bell,
+  CheckCircle,
+  AlertCircle,
+  Info,
   AlertTriangle,
   X,
   Settings,
-  Zap
+  Zap,
+  HelpCircle
 } from 'lucide-react';
 import { toast } from 'sonner';
+
+const notificationsWhyWhen = {
+  why: {
+    title: "Pourquoi un système de notifications Toast ?",
+    description: "Les notifications toast sont essentielles pour le feedback utilisateur. Sonner est la bibliothèque la plus moderne et performante pour React, offrant des animations fluides, un stacking intelligent, et une API simple. Elle remplace avantageusement react-toastify et react-hot-toast.",
+    benefits: [
+      "Animations fluides et naturelles avec Framer Motion",
+      "Stacking intelligent des notifications multiples",
+      "Positionnement flexible (top, bottom, corners)",
+      "Types prédéfinis : success, error, warning, info, loading",
+      "Promesses avec états automatiques (loading → success/error)",
+      "Toasts personnalisables avec JSX",
+      "Accessibilité (ARIA, focus management)",
+      "Bundle léger et performant"
+    ],
+    problemsSolved: [
+      "Feedback silencieux après les actions utilisateur",
+      "Implémentation maison des notifications répétitive",
+      "Animations complexes à coder soi-même",
+      "Gestion du z-index et du stacking",
+      "Accessibilité souvent négligée",
+      "Expérience utilisateur incohérente entre les projets"
+    ]
+  },
+  when: {
+    idealCases: [
+      {
+        title: "Confirmation d'actions",
+        description: "Après une sauvegarde, un envoi de formulaire, un ajout au panier.",
+        example: "toast.success('Produit ajouté au panier')"
+      },
+      {
+        title: "Messages d'erreur",
+        description: "Échec de connexion, validation échouée, erreur serveur.",
+        example: "toast.error('Impossible de se connecter')"
+      },
+      {
+        title: "Actions asynchrones",
+        description: "Upload de fichier, envoi d'email, synchronisation avec loading state.",
+        example: "toast.promise(uploadFile(), { loading: 'Upload...', success: 'Terminé!', error: 'Échec' })"
+      },
+      {
+        title: "Notifications informatives",
+        description: "Mise à jour disponible, session expirée, nouveaux messages.",
+        example: "toast.info('Nouvelle version disponible')"
+      }
+    ],
+    avoidCases: [
+      {
+        title: "Messages critiques nécessitant une action",
+        description: "Pour des confirmations importantes, utilisez une modal ou un dialog.",
+        example: "Confirmation de suppression, acceptation de CGU"
+      },
+      {
+        title: "Contenus longs ou complexes",
+        description: "Les toasts doivent être courts. Pour plus de détails, utilisez une page ou une modal.",
+        example: "Récapitulatif de commande, détails d'erreur techniques"
+      },
+      {
+        title: "Notifications persistantes",
+        description: "Pour des bannières permanentes, utilisez un composant dédié dans le layout.",
+        example: "Bannière de maintenance, annonce importante"
+      }
+    ],
+    realWorldExamples: [
+      {
+        title: "E-commerce - Panier",
+        description: "Toast de succès avec image du produit ajouté et lien vers le panier.",
+        example: "toast.success(<ProductAddedToast product={product} />)"
+      },
+      {
+        title: "Formulaire de contact",
+        description: "Loading pendant l'envoi, success avec message personnalisé, error avec retry.",
+        example: "toast.promise(sendEmail(data), {...})"
+      },
+      {
+        title: "Upload de fichier",
+        description: "Barre de progression pendant l'upload, success avec preview.",
+        example: "toast.loading('Upload...', { id }); toast.success('Terminé', { id })"
+      },
+      {
+        title: "Copier dans le presse-papier",
+        description: "Feedback instantané quand l'utilisateur copie un lien ou un code.",
+        example: "navigator.clipboard.writeText(text); toast.success('Copié!')"
+      },
+      {
+        title: "Connexion/Déconnexion",
+        description: "Messages de bienvenue personnalisés, confirmation de déconnexion.",
+        example: "toast.success(`Bienvenue, ${user.name}!`)"
+      },
+      {
+        title: "Notifications push",
+        description: "Nouveaux messages, mentions, notifications sociales.",
+        example: "toast.message(notification.title, { description: notification.body })"
+      }
+    ]
+  }
+};
 
 // Custom Toast Component
 interface CustomToastProps {
@@ -398,21 +498,40 @@ function ServerActionToastExample() {
 
 export default function NotificationsPage() {
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold mb-4">Toast Notifications</h1>
-        <p className="text-xl text-muted-foreground">
-          Learn Sonner integration and custom notification systems for both client and server components.
-        </p>
+    <div className="min-h-screen">
+      {/* Header */}
+      <div className="border-b border-border bg-card/50">
+        <div className="container mx-auto px-4 py-12 md:py-16">
+          <div className="max-w-3xl">
+            <Badge variant="secondary" className="mb-4 text-xs tracking-wider uppercase">
+              UI/UX
+            </Badge>
+            <h1 className="mb-4">Toast Notifications</h1>
+            <p className="text-lg text-muted-foreground leading-relaxed">
+              Learn Sonner integration and custom notification systems for both client and server components.
+            </p>
+            <div className="w-12 h-1 bg-accent mt-6" />
+          </div>
+        </div>
       </div>
 
-      <Tabs defaultValue="basics" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4">
+      <div className="container mx-auto px-4 py-8 md:py-12">
+      <Tabs defaultValue="why-when" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-3 lg:grid-cols-5">
+          <TabsTrigger value="why-when" className="flex items-center gap-1">
+            <HelpCircle className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Pourquoi/Quand</span>
+            <span className="sm:hidden">?</span>
+          </TabsTrigger>
           <TabsTrigger value="basics">Basics</TabsTrigger>
           <TabsTrigger value="sonner">Sonner Examples</TabsTrigger>
           <TabsTrigger value="custom">Custom Toasts</TabsTrigger>
           <TabsTrigger value="server">Server Actions</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="why-when">
+          <WhyWhenTabs why={notificationsWhyWhen.why} when={notificationsWhyWhen.when} />
+        </TabsContent>
 
         <TabsContent value="basics" className="space-y-6">
           <Card>
@@ -882,6 +1001,7 @@ export async function deleteUser(userId: string) {
           />
         </TabsContent>
       </Tabs>
+      </div>
     </div>
   );
 }

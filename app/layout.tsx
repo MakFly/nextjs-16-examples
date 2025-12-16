@@ -1,15 +1,19 @@
 import './globals.css';
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
 import { Toaster } from 'sonner';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Navigation } from '@/components/navigation';
+import { LocaleProvider } from '@/components/locale-provider';
+import { NextIntlProvider } from '@/components/next-intl-provider';
 
-const inter = Inter({ subsets: ['latin'] });
+// Load messages for NextIntlClientProvider
+// For static export, we'll use a simpler approach
+// The messages will be loaded dynamically client-side
 
 export const metadata: Metadata = {
-  title: 'Next.js App Router Tutorial',
-  description: 'Complete tutorial covering Next.js App Router, Zod, Zustand, Server Components, Server Actions, React Hook Form, and Toast notifications',
+  title: 'Next.js 16 Tutorials',
+  description: 'A comprehensive tutorial series covering Next.js App Router, React Server Components, Zod, Zustand, TanStack Query, and modern React patterns.',
+  keywords: ['Next.js', 'React', 'Tutorial', 'App Router', 'Server Components', 'TypeScript'],
 };
 
 export default function RootLayout({
@@ -19,19 +23,37 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <Navigation />
-          <main className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-slate-950 dark:via-blue-950 dark:to-indigo-950">
-            {children}
-          </main>
-          <Toaster richColors position="top-right" />
-        </ThemeProvider>
+      <body className="font-sans antialiased">
+        <LocaleProvider>
+          <NextIntlProvider>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange
+            >
+              <div className="relative min-h-screen bg-background">
+                <Navigation />
+                <main>
+                  {children}
+                </main>
+              </div>
+              <Toaster
+                position="top-right"
+                toastOptions={{
+                  style: {
+                    fontFamily: 'var(--font-sans)',
+                  },
+                  classNames: {
+                    toast: 'border border-border shadow-lg',
+                    title: 'font-medium',
+                    description: 'text-muted-foreground',
+                  },
+                }}
+              />
+            </ThemeProvider>
+          </NextIntlProvider>
+        </LocaleProvider>
       </body>
     </html>
   );

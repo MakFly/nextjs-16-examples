@@ -6,11 +6,110 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { CodeExample } from '@/components/code-example';
+import { WhyWhenTabs } from '@/components/why-when-tabs';
 import { useCounterStore } from '@/lib/stores/counter-store';
 import { useTodoStore } from '@/lib/stores/todo-store';
 import { useState } from 'react';
-import { Plus, Minus, RotateCcw, Trash2, Check } from 'lucide-react';
+import { Plus, Minus, RotateCcw, Trash2, Check, HelpCircle } from 'lucide-react';
 import { toast } from 'sonner';
+
+const zustandWhyWhen = {
+  why: {
+    title: "Pourquoi Zustand ?",
+    description: "Zustand est une solution de gestion d'état minimaliste et performante pour React. Avec seulement 2.6kB, elle offre une API simple sans boilerplate, pas de providers nécessaires, et une intégration parfaite avec TypeScript. C'est l'alternative moderne à Redux pour la plupart des cas d'usage.",
+    benefits: [
+      "Bundle ultra-léger (2.6kB) comparé à Redux (~7kB) ou MobX (~16kB)",
+      "Aucun Provider ou Context nécessaire - utilisation directe des hooks",
+      "API simple et intuitive sans actions, reducers ou dispatchers",
+      "Middleware intégré : persist (localStorage), devtools, immer",
+      "Sélection fine de l'état pour éviter les re-renders inutiles",
+      "Fonctionne hors React (vanilla JS, Node.js)",
+      "Support natif des actions asynchrones sans middleware",
+      "TypeScript-first avec inférence de types complète"
+    ],
+    problemsSolved: [
+      "Boilerplate excessif de Redux (actions, reducers, types)",
+      "Prop drilling à travers de nombreux composants",
+      "Re-renders inutiles avec Context API",
+      "Complexité de configuration des DevTools",
+      "Persistance de l'état nécessitant des libs supplémentaires",
+      "Gestion des effets de bord avec des middlewares complexes"
+    ]
+  },
+  when: {
+    idealCases: [
+      {
+        title: "État global de l'application",
+        description: "Thème, langue, préférences utilisateur, état d'authentification - tout ce qui doit être accessible partout.",
+        example: "useUserStore(state => state.theme)"
+      },
+      {
+        title: "Panier e-commerce",
+        description: "État partagé entre header, page produit, et checkout avec persistance automatique.",
+        example: "useCartStore(state => ({ items: state.items, addItem: state.addItem }))"
+      },
+      {
+        title: "État de formulaires multi-étapes",
+        description: "Wizard ou formulaire en plusieurs pages où les données doivent être conservées.",
+        example: "useFormStore(state => state.step1Data)"
+      },
+      {
+        title: "Cache côté client",
+        description: "Stocker temporairement des données API pour éviter des refetch inutiles.",
+        example: "useProductCache(state => state.products[id])"
+      }
+    ],
+    avoidCases: [
+      {
+        title: "État serveur (fetching, caching)",
+        description: "Pour les données provenant d'APIs, préférez TanStack Query qui gère le cache, la revalidation et les états de chargement.",
+        example: "Utilisez useQuery() plutôt que de stocker les résultats API dans Zustand"
+      },
+      {
+        title: "État local d'un seul composant",
+        description: "Si l'état n'est utilisé que dans un composant, useState suffit. Zustand est pour l'état partagé.",
+        example: "const [isOpen, setIsOpen] = useState(false) // Pas besoin de Zustand"
+      },
+      {
+        title: "Formulaires simples",
+        description: "Pour un formulaire isolé, React Hook Form ou un simple useState est plus approprié.",
+        example: "Formulaire de contact, modal de feedback"
+      }
+    ],
+    realWorldExamples: [
+      {
+        title: "Store d'authentification",
+        description: "Gestion du user connecté, token JWT, et état de loading avec persistance sécurisée.",
+        example: "useAuthStore: { user, token, login(), logout(), isAuthenticated }"
+      },
+      {
+        title: "Notifications toast",
+        description: "Stack de notifications accessible depuis n'importe quel composant.",
+        example: "useNotificationStore: { notifications, add(), remove(), clear() }"
+      },
+      {
+        title: "Sidebar/Navigation state",
+        description: "État d'ouverture de la sidebar, onglet actif, breadcrumbs.",
+        example: "useUIStore: { sidebarOpen, activeTab, toggleSidebar() }"
+      },
+      {
+        title: "Filtres et recherche",
+        description: "État des filtres d'une liste partagé entre la sidebar et les résultats.",
+        example: "useFilterStore: { filters, setFilter(), resetFilters(), activeFilters }"
+      },
+      {
+        title: "Mode hors-ligne",
+        description: "Queue d'actions à synchroniser quand la connexion revient.",
+        example: "useOfflineStore: { pendingActions, addAction(), sync(), isOnline }"
+      },
+      {
+        title: "Comparateur de produits",
+        description: "Liste de produits à comparer accessible depuis les cards produits et la page de comparaison.",
+        example: "useCompareStore: { products, add(), remove(), clear(), maxItems: 4 }"
+      }
+    ]
+  }
+};
 
 export default function ZustandPage() {
   const { count, increment, decrement, reset, setCount } = useCounterStore();
@@ -36,21 +135,40 @@ export default function ZustandPage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold mb-4">Zustand State Management</h1>
-        <p className="text-xl text-muted-foreground">
-          Learn simple, scalable state management with Zustand.
-        </p>
+    <div className="min-h-screen">
+      {/* Header */}
+      <div className="border-b border-border bg-card/50">
+        <div className="container mx-auto px-4 py-12 md:py-16">
+          <div className="max-w-3xl">
+            <Badge variant="secondary" className="mb-4 text-xs tracking-wider uppercase">
+              State Management
+            </Badge>
+            <h1 className="mb-4">Zustand</h1>
+            <p className="text-lg text-muted-foreground leading-relaxed">
+              Learn simple, scalable state management with Zustand.
+            </p>
+            <div className="w-12 h-1 bg-accent mt-6" />
+          </div>
+        </div>
       </div>
 
-      <Tabs defaultValue="basics" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4">
+      <div className="container mx-auto px-4 py-8 md:py-12">
+      <Tabs defaultValue="why-when" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-3 lg:grid-cols-5">
+          <TabsTrigger value="why-when" className="flex items-center gap-1">
+            <HelpCircle className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Pourquoi/Quand</span>
+            <span className="sm:hidden">?</span>
+          </TabsTrigger>
           <TabsTrigger value="basics">Basics</TabsTrigger>
           <TabsTrigger value="counter">Counter Demo</TabsTrigger>
           <TabsTrigger value="todos">Todo Demo</TabsTrigger>
           <TabsTrigger value="advanced">Advanced</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="why-when">
+          <WhyWhenTabs why={zustandWhyWhen.why} when={zustandWhyWhen.when} />
+        </TabsContent>
 
         <TabsContent value="basics" className="space-y-6">
           <Card>
@@ -624,6 +742,7 @@ export const useAppStore = create<AuthSlice & CartSlice & UISlice>()(
           </Card>
         </TabsContent>
       </Tabs>
+      </div>
     </div>
   );
 }

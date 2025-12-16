@@ -1,766 +1,1143 @@
 'use client';
 
 import { useState } from 'react';
-import { useForm, useFieldArray, Controller } from 'react-hook-form';
+import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { CodeExample } from '@/components/code-example';
 import { Badge } from '@/components/ui/badge';
-import { 
-  FormInput, 
-  CheckCircle, 
-  AlertCircle, 
-  Plus, 
+import { WhyWhenTabs } from '@/components/why-when-tabs';
+import { Separator } from '@/components/ui/separator';
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from '@/components/ui/form';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  FormInput,
+  CheckCircle,
+  AlertCircle,
+  Plus,
   Trash2,
   Eye,
-  EyeOff
+  EyeOff,
+  HelpCircle,
+  Mail,
+  Lock,
+  User,
+  CreditCard,
+  MapPin,
+  Phone,
+  Building,
+  ShoppingCart,
+  UserCircle,
+  Settings,
+  Loader2
 } from 'lucide-react';
 import { toast } from 'sonner';
 
-// Schemas for different examples
-const simpleSchema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters'),
-  email: z.string().email('Invalid email address'),
-  age: z.number().min(18, 'Must be at least 18 years old'),
-});
+const reactHookFormWhyWhen = {
+  why: {
+    title: "Pourquoi React Hook Form + shadcn/ui Form ?",
+    description: "React Hook Form combiné avec les composants Form de shadcn/ui offre la meilleure expérience développeur pour créer des formulaires accessibles, performants et maintenables. Les composants gèrent automatiquement les attributs ARIA, les erreurs, et l'état du formulaire.",
+    benefits: [
+      "Composants Form accessibles avec gestion automatique des attributs ARIA",
+      "Performance optimale : moins de re-renders grâce aux uncontrolled inputs",
+      "Intégration native avec Zod pour validation type-safe",
+      "API déclarative et composable avec FormField, FormItem, FormControl",
+      "Messages d'erreur automatiques avec FormMessage",
+      "Descriptions de champs avec FormDescription",
+      "IDs uniques générés automatiquement via React.useId()",
+      "Support complet de TypeScript avec inférence des types"
+    ],
+    problemsSolved: [
+      "Boilerplate répétitif pour chaque champ (label, input, error, description)",
+      "Accessibilité souvent négligée (aria-describedby, aria-invalid)",
+      "Gestion manuelle des IDs pour les labels et inputs",
+      "Styles incohérents entre les formulaires du projet",
+      "Re-renders excessifs avec les formulaires contrôlés",
+      "Validation complexe et messages d'erreur difficiles à gérer"
+    ]
+  },
+  when: {
+    idealCases: [
+      {
+        title: "Formulaires d'inscription/connexion",
+        description: "Email, mot de passe avec confirmation, validation en temps réel, gestion des erreurs serveur.",
+        example: "FormField + zodResolver pour validation email/password"
+      },
+      {
+        title: "Checkout e-commerce",
+        description: "Adresses de livraison/facturation, méthode de paiement, validation conditionnelle.",
+        example: "useFieldArray pour les articles, FormField pour chaque section"
+      },
+      {
+        title: "Formulaires de profil utilisateur",
+        description: "Édition d'informations personnelles, préférences, liens sociaux.",
+        example: "watch() pour preview en temps réel, FormDescription pour les hints"
+      },
+      {
+        title: "Création de contenu (CMS/Blog)",
+        description: "Titre, contenu, catégories, tags, SEO metadata, dates de publication.",
+        example: "Formulaire multi-sections avec Select, Textarea, et validation"
+      }
+    ],
+    avoidCases: [
+      {
+        title: "Recherche simple",
+        description: "Pour un champ de recherche isolé, un simple useState avec debounce suffit.",
+        example: "Barre de recherche dans le header"
+      },
+      {
+        title: "Formulaires sans validation",
+        description: "Si aucune validation n'est nécessaire, le overhead peut être inutile.",
+        example: "Formulaire de feedback optionnel très simple"
+      },
+      {
+        title: "Inputs contrôlés obligatoires",
+        description: "Si vous devez réagir à chaque frappe (autocomplétion), considérez Controller.",
+        example: "Recherche avec suggestions en temps réel"
+      }
+    ],
+    realWorldExamples: [
+      {
+        title: "Stripe Checkout",
+        description: "Formulaire de paiement avec validation de carte, adresse, et gestion des erreurs Stripe.",
+        example: "FormField pour card number, expiry, CVC avec masques"
+      },
+      {
+        title: "GitHub - Création de repo",
+        description: "Nom, description, visibilité, .gitignore, licence avec validation du nom unique.",
+        example: "Async validation pour vérifier la disponibilité du nom"
+      },
+      {
+        title: "Airbnb - Création d'annonce",
+        description: "Wizard multi-étapes : type, emplacement, équipements, photos, prix.",
+        example: "useForm avec state persisté entre les étapes"
+      },
+      {
+        title: "LinkedIn - Édition de profil",
+        description: "Sections repliables, champs dynamiques pour expériences et formations.",
+        example: "useFieldArray pour les expériences, FormDescription pour les conseils"
+      },
+      {
+        title: "Notion - Création de page",
+        description: "Titre, icône, cover, propriétés dynamiques selon le type de base.",
+        example: "Schema dynamique basé sur le type sélectionné"
+      },
+      {
+        title: "Calendly - Créer un événement",
+        description: "Durée, disponibilités, questions personnalisées, intégrations.",
+        example: "useFieldArray pour les questions, Select pour les durées"
+      }
+    ]
+  }
+};
 
-const complexSchema = z.object({
-  personalInfo: z.object({
-    firstName: z.string().min(2, 'First name is required'),
-    lastName: z.string().min(2, 'Last name is required'),
-    email: z.string().email('Invalid email address'),
-    phone: z.string().regex(/^\d{10}$/, 'Phone must be 10 digits'),
-  }),
-  address: z.object({
-    street: z.string().min(5, 'Street address is required'),
-    city: z.string().min(2, 'City is required'),
-    zipCode: z.string().regex(/^\d{5}$/, 'ZIP code must be 5 digits'),
-    country: z.string().min(2, 'Country is required'),
-  }),
-  preferences: z.object({
-    newsletter: z.boolean(),
-    notifications: z.boolean(),
-    theme: z.enum(['light', 'dark', 'system']),
-  }),
-  skills: z.array(z.object({
-    name: z.string().min(1, 'Skill name is required'),
-    level: z.enum(['beginner', 'intermediate', 'advanced']),
-  })).min(1, 'At least one skill is required'),
-});
+// ============================================
+// SCHÉMAS ZOD POUR LES EXEMPLES
+// ============================================
 
-const advancedSchema = z.object({
-  username: z.string()
-    .min(3, 'Username must be at least 3 characters')
-    .regex(/^[a-zA-Z0-9_]+$/, 'Username can only contain letters, numbers, and underscores'),
+// 1. Formulaire d'inscription (comme GitHub, Stripe)
+const signupSchema = z.object({
+  email: z.string().email("Adresse email invalide"),
   password: z.string()
-    .min(8, 'Password must be at least 8 characters')
-    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, 'Password must contain uppercase, lowercase, and number'),
+    .min(8, "Le mot de passe doit contenir au moins 8 caractères")
+    .regex(/[A-Z]/, "Doit contenir au moins une majuscule")
+    .regex(/[0-9]/, "Doit contenir au moins un chiffre"),
   confirmPassword: z.string(),
-  bio: z.string().max(500, 'Bio must not exceed 500 characters').optional(),
-  website: z.string().url('Invalid URL').optional().or(z.literal('')),
-  socialLinks: z.array(z.object({
-    platform: z.string().min(1, 'Platform is required'),
-    url: z.string().url('Invalid URL'),
-  })).optional(),
+  fullName: z.string().min(2, "Le nom doit contenir au moins 2 caractères"),
+  acceptTerms: z.boolean().refine(val => val === true, {
+    message: "Vous devez accepter les conditions d'utilisation"
+  }),
+  newsletter: z.boolean(),
 }).refine(data => data.password === data.confirmPassword, {
-  message: "Passwords don't match",
+  message: "Les mots de passe ne correspondent pas",
   path: ["confirmPassword"],
 });
 
-type SimpleFormData = z.infer<typeof simpleSchema>;
-type ComplexFormData = z.infer<typeof complexSchema>;
-type AdvancedFormData = z.infer<typeof advancedSchema>;
+// 2. Formulaire de checkout (comme Stripe, Amazon)
+const checkoutSchema = z.object({
+  // Informations de contact
+  email: z.string().email("Email invalide"),
+  phone: z.string().regex(/^(\+33|0)[1-9](\d{2}){4}$/, "Numéro de téléphone invalide"),
 
-// Simple Form Component
-function SimpleForm() {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-    reset,
-  } = useForm<SimpleFormData>({
-    resolver: zodResolver(simpleSchema),
-  });
+  // Adresse de livraison
+  shipping: z.object({
+    firstName: z.string().min(2, "Prénom requis"),
+    lastName: z.string().min(2, "Nom requis"),
+    address: z.string().min(5, "Adresse requise"),
+    city: z.string().min(2, "Ville requise"),
+    postalCode: z.string().regex(/^\d{5}$/, "Code postal invalide"),
+    country: z.string().min(2, "Pays requis"),
+  }),
 
-  const onSubmit = async (data: SimpleFormData) => {
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    toast.success('Simple form submitted successfully!');
-    console.log('Simple form data:', data);
-    reset();
-  };
+  // Facturation
+  sameAsShipping: z.boolean(),
 
-  return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      <div>
-        <Label htmlFor="simple-name">Name</Label>
-        <Input
-          id="simple-name"
-          {...register('name')}
-          className={errors.name ? 'border-red-500' : ''}
-        />
-        {errors.name && (
-          <p className="text-red-500 text-sm mt-1">{errors.name.message}</p>
-        )}
-      </div>
+  // Instructions
+  deliveryNotes: z.string().max(500).optional(),
+});
 
-      <div>
-        <Label htmlFor="simple-email">Email</Label>
-        <Input
-          id="simple-email"
-          type="email"
-          {...register('email')}
-          className={errors.email ? 'border-red-500' : ''}
-        />
-        {errors.email && (
-          <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>
-        )}
-      </div>
+// 3. Formulaire de création de projet (comme GitHub, Vercel)
+const projectSchema = z.object({
+  name: z.string()
+    .min(3, "Le nom doit contenir au moins 3 caractères")
+    .max(50, "Le nom ne peut pas dépasser 50 caractères")
+    .regex(/^[a-z0-9-]+$/, "Uniquement des lettres minuscules, chiffres et tirets"),
+  description: z.string().max(200, "200 caractères maximum").optional(),
+  visibility: z.enum(["public", "private"], {
+    message: "Sélectionnez une visibilité",
+  }),
+  framework: z.string().min(1, "Sélectionnez un framework"),
+  features: z.array(z.object({
+    name: z.string().min(1, "Nom de la feature requis"),
+    priority: z.enum(["low", "medium", "high"]),
+  })).optional(),
+  readme: z.boolean(),
+  gitignore: z.boolean(),
+});
 
-      <div>
-        <Label htmlFor="simple-age">Age</Label>
-        <Input
-          id="simple-age"
-          type="number"
-          {...register('age', { valueAsNumber: true })}
-          className={errors.age ? 'border-red-500' : ''}
-        />
-        {errors.age && (
-          <p className="text-red-500 text-sm mt-1">{errors.age.message}</p>
-        )}
-      </div>
+type SignupFormData = z.infer<typeof signupSchema>;
+type CheckoutFormData = z.infer<typeof checkoutSchema>;
+type ProjectFormData = z.infer<typeof projectSchema>;
 
-      <Button type="submit" disabled={isSubmitting} className="w-full">
-        {isSubmitting ? 'Submitting...' : 'Submit Simple Form'}
-      </Button>
-    </form>
-  );
-}
-
-// Complex Form Component
-function ComplexForm() {
-  const {
-    register,
-    handleSubmit,
-    control,
-    formState: { errors, isSubmitting },
-    reset,
-    watch,
-  } = useForm<ComplexFormData>({
-    resolver: zodResolver(complexSchema),
-    defaultValues: {
-      preferences: {
-        newsletter: false,
-        notifications: true,
-        theme: 'system',
-      },
-      skills: [{ name: '', level: 'beginner' }],
-    },
-  });
-
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: 'skills',
-  });
-
-  const watchedTheme = watch('preferences.theme');
-
-  const onSubmit = async (data: ComplexFormData) => {
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    toast.success('Complex form submitted successfully!');
-    console.log('Complex form data:', data);
-  };
-
-  return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-      {/* Personal Information */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Personal Information</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid md:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="firstName">First Name</Label>
-              <Input
-                id="firstName"
-                {...register('personalInfo.firstName')}
-                className={errors.personalInfo?.firstName ? 'border-red-500' : ''}
-              />
-              {errors.personalInfo?.firstName && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.personalInfo.firstName.message}
-                </p>
-              )}
-            </div>
-            
-            <div>
-              <Label htmlFor="lastName">Last Name</Label>
-              <Input
-                id="lastName"
-                {...register('personalInfo.lastName')}
-                className={errors.personalInfo?.lastName ? 'border-red-500' : ''}
-              />
-              {errors.personalInfo?.lastName && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.personalInfo.lastName.message}
-                </p>
-              )}
-            </div>
-          </div>
-
-          <div>
-            <Label htmlFor="complex-email">Email</Label>
-            <Input
-              id="complex-email"
-              type="email"
-              {...register('personalInfo.email')}
-              className={errors.personalInfo?.email ? 'border-red-500' : ''}
-            />
-            {errors.personalInfo?.email && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.personalInfo.email.message}
-              </p>
-            )}
-          </div>
-
-          <div>
-            <Label htmlFor="phone">Phone</Label>
-            <Input
-              id="phone"
-              {...register('personalInfo.phone')}
-              placeholder="1234567890"
-              className={errors.personalInfo?.phone ? 'border-red-500' : ''}
-            />
-            {errors.personalInfo?.phone && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.personalInfo.phone.message}
-              </p>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Address */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Address</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <Label htmlFor="street">Street Address</Label>
-            <Input
-              id="street"
-              {...register('address.street')}
-              className={errors.address?.street ? 'border-red-500' : ''}
-            />
-            {errors.address?.street && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.address.street.message}
-              </p>
-            )}
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-4">
-            <div>
-              <Label htmlFor="city">City</Label>
-              <Input
-                id="city"
-                {...register('address.city')}
-                className={errors.address?.city ? 'border-red-500' : ''}
-              />
-              {errors.address?.city && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.address.city.message}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <Label htmlFor="zipCode">ZIP Code</Label>
-              <Input
-                id="zipCode"
-                {...register('address.zipCode')}
-                className={errors.address?.zipCode ? 'border-red-500' : ''}
-              />
-              {errors.address?.zipCode && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.address.zipCode.message}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <Label htmlFor="country">Country</Label>
-              <Input
-                id="country"
-                {...register('address.country')}
-                className={errors.address?.country ? 'border-red-500' : ''}
-              />
-              {errors.address?.country && (
-                <p className="text-red-500 text-sm mt-1">
-                  {errors.address.country.message}
-                </p>
-              )}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Preferences */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Preferences</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-3">
-            <div className="flex items-center space-x-2">
-              <Controller
-                name="preferences.newsletter"
-                control={control}
-                render={({ field }) => (
-                  <Checkbox
-                    id="newsletter"
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
-                )}
-              />
-              <Label htmlFor="newsletter">Subscribe to newsletter</Label>
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <Controller
-                name="preferences.notifications"
-                control={control}
-                render={({ field }) => (
-                  <Checkbox
-                    id="notifications"
-                    checked={field.value}
-                    onCheckedChange={field.onChange}
-                  />
-                )}
-              />
-              <Label htmlFor="notifications">Enable notifications</Label>
-            </div>
-          </div>
-
-          <div>
-            <Label htmlFor="theme">Theme Preference</Label>
-            <select
-              id="theme"
-              {...register('preferences.theme')}
-              className="w-full p-2 border rounded-md"
-            >
-              <option value="light">Light</option>
-              <option value="dark">Dark</option>
-              <option value="system">System</option>
-            </select>
-            <p className="text-sm text-muted-foreground mt-1">
-              Current selection: {watchedTheme}
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Skills */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Skills</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {fields.map((field, index) => (
-            <div key={field.id} className="flex gap-2 items-end">
-              <div className="flex-1">
-                <Label htmlFor={`skill-${index}`}>Skill Name</Label>
-                <Input
-                  id={`skill-${index}`}
-                  {...register(`skills.${index}.name`)}
-                  className={errors.skills?.[index]?.name ? 'border-red-500' : ''}
-                />
-                {errors.skills?.[index]?.name && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.skills[index]?.name?.message}
-                  </p>
-                )}
-              </div>
-              
-              <div className="flex-1">
-                <Label htmlFor={`level-${index}`}>Level</Label>
-                <select
-                  id={`level-${index}`}
-                  {...register(`skills.${index}.level`)}
-                  className="w-full p-2 border rounded-md"
-                >
-                  <option value="beginner">Beginner</option>
-                  <option value="intermediate">Intermediate</option>
-                  <option value="advanced">Advanced</option>
-                </select>
-              </div>
-              
-              <Button
-                type="button"
-                variant="outline"
-                size="icon"
-                onClick={() => remove(index)}
-                disabled={fields.length === 1}
-              >
-                <Trash2 className="h-4 w-4" />
-              </Button>
-            </div>
-          ))}
-          
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => append({ name: '', level: 'beginner' })}
-            className="w-full"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Add Skill
-          </Button>
-          
-          {errors.skills && (
-            <p className="text-red-500 text-sm">{errors.skills.message}</p>
-          )}
-        </CardContent>
-      </Card>
-
-      <Button type="submit" disabled={isSubmitting} className="w-full">
-        {isSubmitting ? 'Submitting...' : 'Submit Complex Form'}
-      </Button>
-    </form>
-  );
-}
-
-// Advanced Form Component
-function AdvancedForm() {
+// ============================================
+// COMPOSANT 1: FORMULAIRE D'INSCRIPTION
+// ============================================
+function SignupForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const {
-    register,
-    handleSubmit,
-    control,
-    formState: { errors, isSubmitting, touchedFields, dirtyFields },
-    reset,
-    watch,
-    trigger,
-  } = useForm<AdvancedFormData>({
-    resolver: zodResolver(advancedSchema),
-    mode: 'onChange',
+  const form = useForm<SignupFormData>({
+    resolver: zodResolver(signupSchema),
     defaultValues: {
-      socialLinks: [],
+      email: "",
+      password: "",
+      confirmPassword: "",
+      fullName: "",
+      acceptTerms: false,
+      newsletter: false,
+    },
+  });
+
+  const password = form.watch("password");
+
+  const onSubmit = async (data: SignupFormData) => {
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    toast.success("Compte créé avec succès !", {
+      description: `Bienvenue ${data.fullName} !`,
+    });
+    console.log("Signup data:", data);
+    form.reset();
+  };
+
+  // Calcul de la force du mot de passe
+  const getPasswordStrength = (pwd: string) => {
+    let strength = 0;
+    if (pwd.length >= 8) strength++;
+    if (/[a-z]/.test(pwd)) strength++;
+    if (/[A-Z]/.test(pwd)) strength++;
+    if (/[0-9]/.test(pwd)) strength++;
+    if (/[^a-zA-Z0-9]/.test(pwd)) strength++;
+    return strength;
+  };
+
+  const passwordStrength = getPasswordStrength(password || "");
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <FormField
+          control={form.control}
+          name="fullName"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Nom complet</FormLabel>
+              <FormControl>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input placeholder="Jean Dupont" className="pl-10" {...field} />
+                </div>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Adresse email</FormLabel>
+              <FormControl>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input type="email" placeholder="jean@exemple.com" className="pl-10" {...field} />
+                </div>
+              </FormControl>
+              <FormDescription>
+                Nous ne partagerons jamais votre email.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="password"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Mot de passe</FormLabel>
+              <FormControl>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    className="pl-10 pr-10"
+                    {...field}
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </Button>
+                </div>
+              </FormControl>
+              {password && (
+                <div className="space-y-2">
+                  <div className="flex gap-1">
+                    {[1, 2, 3, 4, 5].map((level) => (
+                      <div
+                        key={level}
+                        className={`h-1 flex-1 rounded ${
+                          passwordStrength >= level
+                            ? level <= 2 ? 'bg-red-500' : level <= 3 ? 'bg-yellow-500' : 'bg-green-500'
+                            : 'bg-muted'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Force : {passwordStrength <= 2 ? 'Faible' : passwordStrength <= 3 ? 'Moyen' : 'Fort'}
+                  </p>
+                </div>
+              )}
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="confirmPassword"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Confirmer le mot de passe</FormLabel>
+              <FormControl>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    type={showConfirmPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    className="pl-10 pr-10"
+                    {...field}
+                  />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  >
+                    {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </Button>
+                </div>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <Separator />
+
+        <FormField
+          control={form.control}
+          name="acceptTerms"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+              <FormControl>
+                <Checkbox
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
+              </FormControl>
+              <div className="space-y-1 leading-none">
+                <FormLabel className="font-normal">
+                  J'accepte les <a href="#" className="text-primary underline">conditions d'utilisation</a> et la <a href="#" className="text-primary underline">politique de confidentialité</a>
+                </FormLabel>
+                <FormMessage />
+              </div>
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="newsletter"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+              <FormControl>
+                <Checkbox
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
+              </FormControl>
+              <div className="space-y-1 leading-none">
+                <FormLabel className="font-normal">
+                  Recevoir les actualités et offres par email
+                </FormLabel>
+              </div>
+            </FormItem>
+          )}
+        />
+
+        <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
+          {form.formState.isSubmitting ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Création en cours...
+            </>
+          ) : (
+            "Créer mon compte"
+          )}
+        </Button>
+      </form>
+    </Form>
+  );
+}
+
+// ============================================
+// COMPOSANT 2: FORMULAIRE DE CHECKOUT
+// ============================================
+function CheckoutForm() {
+  const form = useForm<CheckoutFormData>({
+    resolver: zodResolver(checkoutSchema),
+    defaultValues: {
+      email: "",
+      phone: "",
+      shipping: {
+        firstName: "",
+        lastName: "",
+        address: "",
+        city: "",
+        postalCode: "",
+        country: "France",
+      },
+      sameAsShipping: true,
+      deliveryNotes: "",
+    },
+  });
+
+  const onSubmit = async (data: CheckoutFormData) => {
+    await new Promise(resolve => setTimeout(resolve, 2000));
+    toast.success("Commande confirmée !", {
+      description: "Vous recevrez un email de confirmation.",
+    });
+    console.log("Checkout data:", data);
+  };
+
+  return (
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        {/* Section Contact */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold flex items-center gap-2">
+            <Mail className="h-5 w-5" />
+            Informations de contact
+          </h3>
+
+          <div className="grid md:grid-cols-2 gap-4">
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input type="email" placeholder="votre@email.com" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="phone"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Téléphone</FormLabel>
+                  <FormControl>
+                    <div className="relative">
+                      <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                      <Input placeholder="06 12 34 56 78" className="pl-10" {...field} />
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+        </div>
+
+        <Separator />
+
+        {/* Section Livraison */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-semibold flex items-center gap-2">
+            <MapPin className="h-5 w-5" />
+            Adresse de livraison
+          </h3>
+
+          <div className="grid md:grid-cols-2 gap-4">
+            <FormField
+              control={form.control}
+              name="shipping.firstName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Prénom</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Jean" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="shipping.lastName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Nom</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Dupont" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <FormField
+            control={form.control}
+            name="shipping.address"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Adresse</FormLabel>
+                <FormControl>
+                  <Input placeholder="123 rue de la Paix" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <div className="grid md:grid-cols-3 gap-4">
+            <FormField
+              control={form.control}
+              name="shipping.city"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Ville</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Paris" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="shipping.postalCode"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Code postal</FormLabel>
+                  <FormControl>
+                    <Input placeholder="75001" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="shipping.country"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Pays</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Sélectionner" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="France">France</SelectItem>
+                      <SelectItem value="Belgique">Belgique</SelectItem>
+                      <SelectItem value="Suisse">Suisse</SelectItem>
+                      <SelectItem value="Canada">Canada</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+        </div>
+
+        <Separator />
+
+        {/* Instructions de livraison */}
+        <FormField
+          control={form.control}
+          name="deliveryNotes"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Instructions de livraison (optionnel)</FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder="Code d'entrée, étage, instructions particulières..."
+                  className="resize-none"
+                  {...field}
+                />
+              </FormControl>
+              <FormDescription>
+                Ces informations seront transmises au livreur.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="sameAsShipping"
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+              <FormControl>
+                <Checkbox
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
+              </FormControl>
+              <div className="space-y-1 leading-none">
+                <FormLabel>
+                  Adresse de facturation identique à l'adresse de livraison
+                </FormLabel>
+              </div>
+            </FormItem>
+          )}
+        />
+
+        <Button type="submit" className="w-full" size="lg" disabled={form.formState.isSubmitting}>
+          {form.formState.isSubmitting ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Traitement en cours...
+            </>
+          ) : (
+            <>
+              <CreditCard className="mr-2 h-4 w-4" />
+              Procéder au paiement
+            </>
+          )}
+        </Button>
+      </form>
+    </Form>
+  );
+}
+
+// ============================================
+// COMPOSANT 3: CRÉATION DE PROJET (GitHub-like)
+// ============================================
+function ProjectForm() {
+  const form = useForm<ProjectFormData>({
+    resolver: zodResolver(projectSchema),
+    defaultValues: {
+      name: "",
+      description: "",
+      visibility: "public",
+      framework: "",
+      features: [],
+      readme: true,
+      gitignore: true,
     },
   });
 
   const { fields, append, remove } = useFieldArray({
-    control,
-    name: 'socialLinks',
+    control: form.control,
+    name: "features",
   });
 
-  const watchedUsername = watch('username');
-  const watchedPassword = watch('password');
+  const projectName = form.watch("name");
 
-  const onSubmit = async (data: AdvancedFormData) => {
-    await new Promise(resolve => setTimeout(resolve, 2000));
-    toast.success('Advanced form submitted successfully!');
-    console.log('Advanced form data:', data);
-  };
-
-  const checkUsernameAvailability = async () => {
-    if (watchedUsername && watchedUsername.length >= 3) {
-      await new Promise(resolve => setTimeout(resolve, 500));
-      // Simulate username check
-      const isAvailable = !['admin', 'user', 'test'].includes(watchedUsername.toLowerCase());
-      if (isAvailable) {
-        toast.success('Username is available!');
-      } else {
-        toast.error('Username is already taken');
-      }
-    }
+  const onSubmit = async (data: ProjectFormData) => {
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    toast.success(`Projet "${data.name}" créé !`, {
+      description: `Visibilité : ${data.visibility}`,
+    });
+    console.log("Project data:", data);
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Account Information</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <Label htmlFor="username">Username</Label>
-            <div className="flex gap-2">
-              <Input
-                id="username"
-                {...register('username')}
-                className={errors.username ? 'border-red-500' : 
-                  touchedFields.username && !errors.username ? 'border-green-500' : ''}
-              />
-              <Button
-                type="button"
-                variant="outline"
-                onClick={checkUsernameAvailability}
-                disabled={!watchedUsername || watchedUsername.length < 3}
-              >
-                Check
-              </Button>
-            </div>
-            {errors.username && (
-              <p className="text-red-500 text-sm mt-1">{errors.username.message}</p>
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Nom du projet</FormLabel>
+              <FormControl>
+                <Input placeholder="mon-super-projet" {...field} />
+              </FormControl>
+              <FormDescription>
+                {projectName ? (
+                  <span className="text-green-600">
+                    URL: github.com/votre-username/<strong>{projectName}</strong>
+                  </span>
+                ) : (
+                  "Lettres minuscules, chiffres et tirets uniquement"
+                )}
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Description (optionnel)</FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder="Une brève description de votre projet..."
+                  className="resize-none"
+                  {...field}
+                />
+              </FormControl>
+              <FormDescription>
+                {field.value?.length || 0}/200 caractères
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <div className="grid md:grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="visibility"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Visibilité</FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Sélectionner" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="public">
+                      <div className="flex items-center gap-2">
+                        <span>🌍</span> Public
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="private">
+                      <div className="flex items-center gap-2">
+                        <span>🔒</span> Privé
+                      </div>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
             )}
-            {touchedFields.username && !errors.username && (
-              <p className="text-green-500 text-sm mt-1 flex items-center">
-                <CheckCircle className="h-4 w-4 mr-1" />
-                Username looks good!
-              </p>
+          />
+
+          <FormField
+            control={form.control}
+            name="framework"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Framework</FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Choisir un framework" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="nextjs">Next.js</SelectItem>
+                    <SelectItem value="react">React (Vite)</SelectItem>
+                    <SelectItem value="vue">Vue.js</SelectItem>
+                    <SelectItem value="svelte">SvelteKit</SelectItem>
+                    <SelectItem value="astro">Astro</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
             )}
+          />
+        </div>
+
+        <Separator />
+
+        {/* Features dynamiques avec useFieldArray */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <FormLabel>Features à implémenter</FormLabel>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => append({ name: "", priority: "medium" })}
+            >
+              <Plus className="h-4 w-4 mr-1" />
+              Ajouter
+            </Button>
           </div>
 
-          <div>
-            <Label htmlFor="password">Password</Label>
-            <div className="relative">
-              <Input
-                id="password"
-                type={showPassword ? 'text' : 'password'}
-                {...register('password')}
-                className={errors.password ? 'border-red-500' : ''}
-              />
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="absolute right-2 top-1/2 transform -translate-y-1/2"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-              </Button>
-            </div>
-            {errors.password && (
-              <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
-            )}
-            
-            {/* Password strength indicator */}
-            {watchedPassword && (
-              <div className="mt-2">
-                <div className="text-xs text-muted-foreground mb-1">Password strength:</div>
-                <div className="flex gap-1">
-                  {[1, 2, 3, 4].map((level) => {
-                    const strength = 
-                      (watchedPassword.length >= 8 ? 1 : 0) +
-                      (/[a-z]/.test(watchedPassword) ? 1 : 0) +
-                      (/[A-Z]/.test(watchedPassword) ? 1 : 0) +
-                      (/\d/.test(watchedPassword) ? 1 : 0);
-                    
-                    return (
-                      <div
-                        key={level}
-                        className={`h-1 flex-1 rounded ${
-                          strength >= level ? 'bg-green-500' : 'bg-gray-200'
-                        }`}
-                      />
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-          </div>
+          {fields.length === 0 && (
+            <p className="text-sm text-muted-foreground text-center py-4 border border-dashed rounded-lg">
+              Aucune feature ajoutée. Cliquez sur "Ajouter" pour commencer.
+            </p>
+          )}
 
-          <div>
-            <Label htmlFor="confirmPassword">Confirm Password</Label>
-            <div className="relative">
-              <Input
-                id="confirmPassword"
-                type={showConfirmPassword ? 'text' : 'password'}
-                {...register('confirmPassword')}
-                className={errors.confirmPassword ? 'border-red-500' : ''}
-              />
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="absolute right-2 top-1/2 transform -translate-y-1/2"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              >
-                {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-              </Button>
-            </div>
-            {errors.confirmPassword && (
-              <p className="text-red-500 text-sm mt-1">{errors.confirmPassword.message}</p>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Profile Information</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <Label htmlFor="bio">Bio (Optional)</Label>
-            <Textarea
-              id="bio"
-              {...register('bio')}
-              placeholder="Tell us about yourself..."
-              className={errors.bio ? 'border-red-500' : ''}
-            />
-            {errors.bio && (
-              <p className="text-red-500 text-sm mt-1">{errors.bio.message}</p>
-            )}
-          </div>
-
-          <div>
-            <Label htmlFor="website">Website (Optional)</Label>
-            <Input
-              id="website"
-              {...register('website')}
-              placeholder="https://example.com"
-              className={errors.website ? 'border-red-500' : ''}
-            />
-            {errors.website && (
-              <p className="text-red-500 text-sm mt-1">{errors.website.message}</p>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Social Links (Optional)</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
           {fields.map((field, index) => (
             <div key={field.id} className="flex gap-2 items-end">
-              <div className="flex-1">
-                <Label htmlFor={`platform-${index}`}>Platform</Label>
-                <Input
-                  id={`platform-${index}`}
-                  {...register(`socialLinks.${index}.platform`)}
-                  placeholder="Twitter, LinkedIn, etc."
-                />
-              </div>
-              
-              <div className="flex-1">
-                <Label htmlFor={`url-${index}`}>URL</Label>
-                <Input
-                  id={`url-${index}`}
-                  {...register(`socialLinks.${index}.url`)}
-                  placeholder="https://..."
-                />
-              </div>
-              
+              <FormField
+                control={form.control}
+                name={`features.${index}.name`}
+                render={({ field }) => (
+                  <FormItem className="flex-1">
+                    {index === 0 && <FormLabel>Nom</FormLabel>}
+                    <FormControl>
+                      <Input placeholder="Authentification, API, etc." {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name={`features.${index}.priority`}
+                render={({ field }) => (
+                  <FormItem className="w-32">
+                    {index === 0 && <FormLabel>Priorité</FormLabel>}
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="low">Basse</SelectItem>
+                        <SelectItem value="medium">Moyenne</SelectItem>
+                        <SelectItem value="high">Haute</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </FormItem>
+                )}
+              />
+
               <Button
                 type="button"
-                variant="outline"
+                variant="ghost"
                 size="icon"
                 onClick={() => remove(index)}
+                className="text-destructive hover:text-destructive"
               >
                 <Trash2 className="h-4 w-4" />
               </Button>
             </div>
           ))}
-          
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => append({ platform: '', url: '' })}
-            className="w-full"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Add Social Link
-          </Button>
-        </CardContent>
-      </Card>
+        </div>
 
-      <Button type="submit" disabled={isSubmitting} className="w-full">
-        {isSubmitting ? 'Creating Account...' : 'Create Account'}
-      </Button>
-    </form>
+        <Separator />
+
+        {/* Options */}
+        <div className="space-y-4">
+          <FormLabel>Options</FormLabel>
+
+          <FormField
+            control={form.control}
+            name="readme"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                <FormControl>
+                  <Checkbox
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                </FormControl>
+                <div className="space-y-1 leading-none">
+                  <FormLabel className="font-normal">
+                    Ajouter un fichier README.md
+                  </FormLabel>
+                  <FormDescription>
+                    Décrit votre projet et comment l'utiliser
+                  </FormDescription>
+                </div>
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="gitignore"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                <FormControl>
+                  <Checkbox
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                  />
+                </FormControl>
+                <div className="space-y-1 leading-none">
+                  <FormLabel className="font-normal">
+                    Ajouter un fichier .gitignore
+                  </FormLabel>
+                  <FormDescription>
+                    Exclut node_modules, .env, etc.
+                  </FormDescription>
+                </div>
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <Button type="submit" className="w-full" disabled={form.formState.isSubmitting}>
+          {form.formState.isSubmitting ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Création en cours...
+            </>
+          ) : (
+            <>
+              <Building className="mr-2 h-4 w-4" />
+              Créer le projet
+            </>
+          )}
+        </Button>
+      </form>
+    </Form>
   );
 }
 
+// ============================================
+// PAGE PRINCIPALE
+// ============================================
 export default function ReactHookFormPage() {
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold mb-4">React Hook Form</h1>
-        <p className="text-xl text-muted-foreground">
-          Advanced form handling with validation, performance optimization, and user experience enhancements.
-        </p>
+    <div className="min-h-screen">
+      {/* Header */}
+      <div className="border-b border-border bg-card/50">
+        <div className="container mx-auto px-4 py-12 md:py-16">
+          <div className="max-w-3xl">
+            <Badge variant="secondary" className="mb-4 text-xs tracking-wider uppercase">
+              Forms
+            </Badge>
+            <h1 className="mb-4">React Hook Form + shadcn/ui</h1>
+            <p className="text-lg text-muted-foreground leading-relaxed">
+              Créez des formulaires accessibles, performants et maintenables avec React Hook Form,
+              Zod et les composants Form de shadcn/ui.
+            </p>
+            <div className="w-12 h-1 bg-accent mt-6" />
+          </div>
+        </div>
       </div>
 
-      <Tabs defaultValue="basics" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4">
-          <TabsTrigger value="basics">Basics</TabsTrigger>
-          <TabsTrigger value="simple">Simple Form</TabsTrigger>
-          <TabsTrigger value="complex">Complex Form</TabsTrigger>
-          <TabsTrigger value="advanced">Advanced Form</TabsTrigger>
-        </TabsList>
+      <div className="container mx-auto px-4 py-8 md:py-12">
+        <Tabs defaultValue="why-when" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-3 lg:grid-cols-5">
+            <TabsTrigger value="why-when" className="flex items-center gap-1">
+              <HelpCircle className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">Pourquoi/Quand</span>
+              <span className="sm:hidden">?</span>
+            </TabsTrigger>
+            <TabsTrigger value="signup">
+              <UserCircle className="h-4 w-4 mr-1 hidden sm:inline" />
+              Inscription
+            </TabsTrigger>
+            <TabsTrigger value="checkout">
+              <ShoppingCart className="h-4 w-4 mr-1 hidden sm:inline" />
+              Checkout
+            </TabsTrigger>
+            <TabsTrigger value="project">
+              <Building className="h-4 w-4 mr-1 hidden sm:inline" />
+              Projet
+            </TabsTrigger>
+            <TabsTrigger value="code">
+              <Settings className="h-4 w-4 mr-1 hidden sm:inline" />
+              Code
+            </TabsTrigger>
+          </TabsList>
 
-        <TabsContent value="basics" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <FormInput className="mr-2 h-5 w-5" />
-                Why React Hook Form?
-              </CardTitle>
-              <CardDescription>
-                Performant, flexible forms with easy validation
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid md:grid-cols-3 gap-4">
-                <div className="text-center p-4 border rounded-lg">
-                  <CheckCircle className="h-8 w-8 text-green-600 mx-auto mb-2" />
-                  <h3 className="font-semibold">Performance</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Minimal re-renders and fast validation
-                  </p>
-                </div>
-                <div className="text-center p-4 border rounded-lg">
-                  <FormInput className="h-8 w-8 text-blue-600 mx-auto mb-2" />
-                  <h3 className="font-semibold">Developer Experience</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Simple API with TypeScript support
-                  </p>
-                </div>
-                <div className="text-center p-4 border rounded-lg">
-                  <AlertCircle className="h-8 w-8 text-orange-600 mx-auto mb-2" />
-                  <h3 className="font-semibold">Validation</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Built-in and custom validation rules
-                  </p>
-                </div>
-              </div>
+          <TabsContent value="why-when">
+            <WhyWhenTabs why={reactHookFormWhyWhen.why} when={reactHookFormWhyWhen.when} />
+          </TabsContent>
 
-              <CodeExample
-                title="Basic React Hook Form Setup"
-                code={`import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+          <TabsContent value="signup" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <UserCircle className="h-5 w-5" />
+                  Formulaire d'inscription
+                </CardTitle>
+                <CardDescription>
+                  Comme sur GitHub, Stripe, ou Vercel - avec validation en temps réel,
+                  force du mot de passe, et gestion des CGU.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <SignupForm />
+              </CardContent>
+            </Card>
+          </TabsContent>
 
-const schema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters'),
-  email: z.string().email('Invalid email address'),
-  age: z.number().min(18, 'Must be at least 18 years old'),
+          <TabsContent value="checkout" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <ShoppingCart className="h-5 w-5" />
+                  Formulaire de checkout
+                </CardTitle>
+                <CardDescription>
+                  Comme sur Amazon ou Stripe - informations de contact,
+                  adresse de livraison, et options de facturation.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <CheckoutForm />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="project" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Building className="h-5 w-5" />
+                  Création de projet
+                </CardTitle>
+                <CardDescription>
+                  Comme sur GitHub ou Vercel - nom, description, visibilité,
+                  et features dynamiques avec useFieldArray.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <ProjectForm />
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          <TabsContent value="code" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle>Structure de base avec shadcn/ui Form</CardTitle>
+                <CardDescription>
+                  La façon recommandée de créer des formulaires accessibles
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid md:grid-cols-3 gap-4">
+                  <div className="text-center p-4 border rounded-lg">
+                    <CheckCircle className="h-8 w-8 text-green-600 mx-auto mb-2" />
+                    <h3 className="font-semibold">Accessibilité</h3>
+                    <p className="text-sm text-muted-foreground">
+                      ARIA automatique, IDs uniques
+                    </p>
+                  </div>
+                  <div className="text-center p-4 border rounded-lg">
+                    <FormInput className="h-8 w-8 text-blue-600 mx-auto mb-2" />
+                    <h3 className="font-semibold">Composable</h3>
+                    <p className="text-sm text-muted-foreground">
+                      FormField, FormItem, FormControl
+                    </p>
+                  </div>
+                  <div className="text-center p-4 border rounded-lg">
+                    <AlertCircle className="h-8 w-8 text-orange-600 mx-auto mb-2" />
+                    <h3 className="font-semibold">Erreurs</h3>
+                    <p className="text-sm text-muted-foreground">
+                      FormMessage automatique
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            <CodeExample
+              title="Structure de base avec shadcn/ui Form"
+              code={`import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+
+// 1. Définir le schéma Zod
+const formSchema = z.object({
+  email: z.string().email("Email invalide"),
+  password: z.string().min(8, "8 caractères minimum"),
 });
 
-type FormData = z.infer<typeof schema>;
+type FormData = z.infer<typeof formSchema>;
 
+// 2. Créer le composant
 function MyForm() {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<FormData>({
-    resolver: zodResolver(schema),
+  const form = useForm<FormData>({
+    resolver: zodResolver(formSchema),
+    defaultValues: { email: "", password: "" },
   });
 
   const onSubmit = async (data: FormData) => {
@@ -768,253 +1145,88 @@ function MyForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <input {...register('name')} />
-      {errors.name && <span>{errors.name.message}</span>}
-      
-      <input {...register('email')} />
-      {errors.email && <span>{errors.email.message}</span>}
-      
-      <input {...register('age', { valueAsNumber: true })} />
-      {errors.age && <span>{errors.age.message}</span>}
-      
-      <button type="submit" disabled={isSubmitting}>
-        Submit
-      </button>
-    </form>
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Email</FormLabel>
+              <FormControl>
+                <Input placeholder="email@example.com" {...field} />
+              </FormControl>
+              <FormDescription>
+                Votre adresse email professionnelle
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="password"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Mot de passe</FormLabel>
+              <FormControl>
+                <Input type="password" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <Button type="submit">S'inscrire</Button>
+      </form>
+    </Form>
   );
 }`}
-              />
-            </CardContent>
-          </Card>
+            />
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Key Features</CardTitle>
-              <CardDescription>
-                What makes React Hook Form powerful
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid md:grid-cols-2 gap-6">
-                <div>
-                  <h3 className="font-semibold mb-3 text-green-600">Performance Benefits</h3>
-                  <ul className="space-y-2 text-sm">
-                    <li className="flex items-start">
-                      <Badge variant="secondary" className="mr-2 mt-0.5">✓</Badge>
-                      Uncontrolled components (minimal re-renders)
-                    </li>
-                    <li className="flex items-start">
-                      <Badge variant="secondary" className="mr-2 mt-0.5">✓</Badge>
-                      Subscription-based form state
-                    </li>
-                    <li className="flex items-start">
-                      <Badge variant="secondary" className="mr-2 mt-0.5">✓</Badge>
-                      Lazy validation and async validation
-                    </li>
-                    <li className="flex items-start">
-                      <Badge variant="secondary" className="mr-2 mt-0.5">✓</Badge>
-                      Built-in performance optimizations
-                    </li>
-                  </ul>
-                </div>
-                
-                <div>
-                  <h3 className="font-semibold mb-3 text-blue-600">Developer Features</h3>
-                  <ul className="space-y-2 text-sm text-muted-foreground">
-                    <li>• TypeScript support out of the box</li>
-                    <li>• Integration with validation libraries</li>
-                    <li>• Field arrays and dynamic forms</li>
-                    <li>• Custom hooks and components</li>
-                    <li>• DevTools for debugging</li>
-                  </ul>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+            <CodeExample
+              title="useFieldArray pour les champs dynamiques"
+              code={`import { useForm, useFieldArray } from "react-hook-form";
 
-        <TabsContent value="simple" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Simple Form Example</CardTitle>
-              <CardDescription>
-                Basic form with validation and error handling
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <SimpleForm />
-            </CardContent>
-          </Card>
-
-          <CodeExample
-            title="Simple Form Implementation"
-            code={`import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-
-const schema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters'),
-  email: z.string().email('Invalid email address'),
-  age: z.number().min(18, 'Must be at least 18 years old'),
+const form = useForm({
+  defaultValues: {
+    features: [{ name: "", priority: "medium" }],
+  },
 });
 
-type FormData = z.infer<typeof schema>;
+const { fields, append, remove } = useFieldArray({
+  control: form.control,
+  name: "features",
+});
 
-function SimpleForm() {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-    reset,
-  } = useForm<FormData>({
-    resolver: zodResolver(schema),
-  });
+// Dans le JSX :
+{fields.map((field, index) => (
+  <div key={field.id} className="flex gap-2">
+    <FormField
+      control={form.control}
+      name={\`features.\${index}.name\`}
+      render={({ field }) => (
+        <FormItem>
+          <FormControl>
+            <Input {...field} />
+          </FormControl>
+        </FormItem>
+      )}
+    />
+    <Button onClick={() => remove(index)}>
+      <Trash2 />
+    </Button>
+  </div>
+))}
 
-  const onSubmit = async (data: FormData) => {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    console.log('Form data:', data);
-    reset(); // Clear form after submission
-  };
-
-  return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      <div>
-        <label htmlFor="name">Name</label>
-        <input
-          id="name"
-          {...register('name')}
-          className={errors.name ? 'border-red-500' : ''}
-        />
-        {errors.name && (
-          <p className="text-red-500 text-sm">{errors.name.message}</p>
-        )}
+<Button onClick={() => append({ name: "", priority: "medium" })}>
+  Ajouter une feature
+</Button>`}
+            />
+          </TabsContent>
+        </Tabs>
       </div>
-
-      <div>
-        <label htmlFor="email">Email</label>
-        <input
-          id="email"
-          type="email"
-          {...register('email')}
-          className={errors.email ? 'border-red-500' : ''}
-        />
-        {errors.email && (
-          <p className="text-red-500 text-sm">{errors.email.message}</p>
-        )}
-      </div>
-
-      <div>
-        <label htmlFor="age">Age</label>
-        <input
-          id="age"
-          type="number"
-          {...register('age', { valueAsNumber: true })}
-          className={errors.age ? 'border-red-500' : ''}
-        />
-        {errors.age && (
-          <p className="text-red-500 text-sm">{errors.age.message}</p>
-        )}
-      </div>
-
-      <button type="submit" disabled={isSubmitting}>
-        {isSubmitting ? 'Submitting...' : 'Submit'}
-      </button>
-    </form>
-  );
-}`}
-          />
-        </TabsContent>
-
-        <TabsContent value="complex" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Complex Form Example</CardTitle>
-              <CardDescription>
-                Multi-section form with nested objects, arrays, and conditional fields
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ComplexForm />
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="advanced" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Advanced Form Example</CardTitle>
-              <CardDescription>
-                Advanced patterns with dynamic fields, real-time validation, and custom components
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <AdvancedForm />
-            </CardContent>
-          </Card>
-
-          <CodeExample
-            title="Advanced Form Patterns"
-            code={`// Custom hook for form validation
-function useAdvancedForm() {
-  const form = useForm<FormData>({
-    resolver: zodResolver(schema),
-    mode: 'onChange', // Real-time validation
-    defaultValues: {
-      socialLinks: [],
-    },
-  });
-
-  // Custom validation trigger
-  const validateUsername = async (username: string) => {
-    const response = await fetch(\`/api/check-username?username=\${username}\`);
-    const { available } = await response.json();
-    return available || 'Username is already taken';
-  };
-
-  return {
-    ...form,
-    validateUsername,
-  };
-}
-
-// Field Array for dynamic fields
-function SocialLinksField({ control, register }) {
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: 'socialLinks',
-  });
-
-  return (
-    <div>
-      {fields.map((field, index) => (
-        <div key={field.id} className="flex gap-2">
-          <input {...register(\`socialLinks.\${index}.platform\`)} />
-          <input {...register(\`socialLinks.\${index}.url\`)} />
-          <button onClick={() => remove(index)}>Remove</button>
-        </div>
-      ))}
-      <button onClick={() => append({ platform: '', url: '' })}>
-        Add Social Link
-      </button>
-    </div>
-  );
-}
-
-// Custom validation with async rules
-const advancedSchema = z.object({
-  username: z.string()
-    .min(3, 'Username must be at least 3 characters')
-    .refine(async (username) => {
-      const response = await fetch(\`/api/check-username?username=\${username}\`);
-      const { available } = await response.json();
-      return available;
-    }, 'Username is already taken'),
-});`}
-          />
-        </TabsContent>
-      </Tabs>
     </div>
   );
 }

@@ -9,16 +9,116 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { CodeExample } from '@/components/code-example';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Zap, 
-  Database, 
-  Shield, 
-  CheckCircle, 
+import { WhyWhenTabs } from '@/components/why-when-tabs';
+import {
+  Zap,
+  Database,
+  Shield,
+  CheckCircle,
   AlertCircle,
-  Send
+  Send,
+  HelpCircle
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Spinner } from '@/components/ui/spinner';
+
+const serverActionsWhyWhen = {
+  why: {
+    title: "Pourquoi les Server Actions ?",
+    description: "Les Server Actions permettent d'exécuter du code côté serveur directement depuis vos composants React, sans créer d'API routes. Elles simplifient drastiquement les mutations de données, la validation, et les opérations sensibles tout en offrant une expérience développeur fluide avec TypeScript.",
+    benefits: [
+      "Pas besoin de créer des API routes séparées pour les mutations",
+      "Typage de bout en bout entre le client et le serveur",
+      "Validation côté serveur automatique avec Zod",
+      "Revalidation automatique du cache après mutation",
+      "Intégration native avec les formulaires HTML (<form action={...}>)",
+      "Optimistic updates faciles avec useOptimistic",
+      "Sécurité : le code reste sur le serveur, jamais exposé au client",
+      "Progressive enhancement : fonctionne même sans JavaScript"
+    ],
+    problemsSolved: [
+      "Boilerplate des API routes (route.ts, fetch, error handling)",
+      "Duplication de la logique de validation client/serveur",
+      "Gestion complexe des états de chargement et d'erreur",
+      "Sécurisation manuelle des endpoints API",
+      "Revalidation manuelle du cache après mutations",
+      "Types désynchronisés entre API et client"
+    ]
+  },
+  when: {
+    idealCases: [
+      {
+        title: "Soumission de formulaires",
+        description: "Inscription, login, création de contenu, mise à jour de profil - toute action déclenchée par un formulaire.",
+        example: "async function createPost(formData: FormData) { 'use server'; await db.posts.create(...) }"
+      },
+      {
+        title: "Mutations de données (CRUD)",
+        description: "Créer, modifier, supprimer des ressources dans la base de données.",
+        example: "async function deletePost(id: string) { 'use server'; await db.posts.delete({ where: { id } }) }"
+      },
+      {
+        title: "Actions avec authentification",
+        description: "Vérification de session, permissions, avant d'effectuer une action sensible.",
+        example: "const session = await getSession(); if (!session) throw new Error('Unauthorized');"
+      },
+      {
+        title: "Envoi d'emails, notifications",
+        description: "Actions qui déclenchent des effets de bord côté serveur.",
+        example: "await sendEmail({ to: user.email, subject: 'Welcome!', ... })"
+      }
+    ],
+    avoidCases: [
+      {
+        title: "Lecture de données (fetching)",
+        description: "Pour le fetching, utilisez les Server Components ou TanStack Query. Les Server Actions sont pour les mutations.",
+        example: "Utilisez async function getData() dans un Server Component, pas une Server Action"
+      },
+      {
+        title: "Opérations temps réel",
+        description: "WebSockets, Server-Sent Events, polling - les Server Actions sont pour des opérations ponctuelles.",
+        example: "Pour un chat en temps réel, utilisez Socket.io ou Pusher"
+      },
+      {
+        title: "APIs publiques consommées par des tiers",
+        description: "Les Server Actions ne sont pas des endpoints REST accessibles de l'extérieur.",
+        example: "Créez des API routes pour les webhooks, intégrations tierces"
+      }
+    ],
+    realWorldExamples: [
+      {
+        title: "Ajout au panier e-commerce",
+        description: "Action qui ajoute un produit au panier, vérifie le stock, et revalide le cache.",
+        example: "addToCart(productId, quantity) → vérification stock → update DB → revalidatePath('/cart')"
+      },
+      {
+        title: "Like/Bookmark",
+        description: "Toggle d'un like avec optimistic update pour une UX instantanée.",
+        example: "likePost(postId) avec useOptimistic pour afficher le like immédiatement"
+      },
+      {
+        title: "Upload de fichier",
+        description: "Réception du fichier, validation, stockage sur S3/Cloudinary, sauvegarde de l'URL en DB.",
+        example: "uploadAvatar(formData) → validate → upload S3 → update user.avatarUrl"
+      },
+      {
+        title: "Inscription newsletter",
+        description: "Validation de l'email, vérification de doublon, ajout à Mailchimp/Resend.",
+        example: "subscribe(email) → zod.email() → check exists → add to newsletter provider"
+      },
+      {
+        title: "Paiement Stripe",
+        description: "Création d'une session de paiement Stripe côté serveur, redirection vers le checkout.",
+        example: "createCheckoutSession(cartItems) → stripe.checkout.sessions.create() → redirect"
+      },
+      {
+        title: "Invitation d'équipe",
+        description: "Génération d'un token d'invitation, envoi d'email, création d'une entrée en DB.",
+        example: "inviteTeamMember(email, role) → generate token → send email → save to pending_invites"
+      }
+    ]
+  }
+};
 
 // Client components for demonstrations
 function SimpleActionForm() {
@@ -218,21 +318,40 @@ function ComplexActionForm() {
 
 export default function ServerActionsPage() {
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold mb-4">Server Actions</h1>
-        <p className="text-xl text-muted-foreground">
-          Learn form handling, mutations, and server-side logic with Server Actions.
-        </p>
+    <div className="min-h-screen">
+      {/* Header */}
+      <div className="border-b border-border bg-card/50">
+        <div className="container mx-auto px-4 py-12 md:py-16">
+          <div className="max-w-3xl">
+            <Badge variant="secondary" className="mb-4 text-xs tracking-wider uppercase">
+              Actions
+            </Badge>
+            <h1 className="mb-4">Server Actions</h1>
+            <p className="text-lg text-muted-foreground leading-relaxed">
+              Learn form handling, mutations, and server-side logic with Server Actions.
+            </p>
+            <div className="w-12 h-1 bg-accent mt-6" />
+          </div>
+        </div>
       </div>
 
-      <Tabs defaultValue="basics" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4">
+      <div className="container mx-auto px-4 py-8 md:py-12">
+      <Tabs defaultValue="why-when" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-3 lg:grid-cols-5">
+          <TabsTrigger value="why-when" className="flex items-center gap-1">
+            <HelpCircle className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Pourquoi/Quand</span>
+            <span className="sm:hidden">?</span>
+          </TabsTrigger>
           <TabsTrigger value="basics">Basics</TabsTrigger>
           <TabsTrigger value="simple">Simple Example</TabsTrigger>
           <TabsTrigger value="complex">Complex Example</TabsTrigger>
           <TabsTrigger value="advanced">Advanced</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="why-when">
+          <WhyWhenTabs why={serverActionsWhyWhen.why} when={serverActionsWhyWhen.when} />
+        </TabsContent>
 
         <TabsContent value="basics" className="space-y-6">
           <Card>
@@ -654,6 +773,7 @@ export async function createUser(prevState: any, formData: FormData) {
           </Card>
         </TabsContent>
       </Tabs>
+      </div>
     </div>
   );
 }

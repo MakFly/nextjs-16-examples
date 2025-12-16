@@ -8,10 +8,11 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { CodeExample } from '@/components/code-example';
-import { 
-  Database, 
-  Zap, 
-  RefreshCw, 
+import { WhyWhenTabs } from '@/components/why-when-tabs';
+import {
+  Database,
+  Zap,
+  RefreshCw,
   CheckCircle,
   XCircle,
   Clock,
@@ -22,12 +23,13 @@ import {
   Edit,
   Eye,
   AlertCircle,
-  ExternalLink
+  ExternalLink,
+  HelpCircle
 } from 'lucide-react';
 import { Spinner } from '@/components/ui/spinner';
-import { 
-  useQuery, 
-  useMutation, 
+import {
+  useQuery,
+  useMutation,
   useQueryClient,
   useInfiniteQuery,
   QueryClient,
@@ -36,6 +38,104 @@ import {
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { toast } from 'sonner';
 import Link from 'next/link';
+
+const tanstackQueryWhyWhen = {
+  why: {
+    title: "Pourquoi TanStack Query ?",
+    description: "TanStack Query (anciennement React Query) est la solution standard pour gérer l'état serveur dans les applications React. Elle gère automatiquement le caching, la synchronisation, les refetch en arrière-plan, et les états de chargement/erreur, vous permettant de vous concentrer sur l'UI plutôt que sur la plomberie.",
+    benefits: [
+      "Cache intelligent avec stale-while-revalidate par défaut",
+      "Refetch automatique (window focus, network reconnect, interval)",
+      "Déduplication des requêtes identiques",
+      "États loading, error, success gérés automatiquement",
+      "Pagination et infinite scroll intégrés",
+      "Mutations avec optimistic updates simples",
+      "DevTools puissants pour déboguer le cache",
+      "Prefetching pour des navigations instantanées"
+    ],
+    problemsSolved: [
+      "Gestion manuelle des états loading/error dans chaque composant",
+      "Requêtes dupliquées quand plusieurs composants demandent les mêmes données",
+      "Données obsolètes après des mutations",
+      "Complexité de l'implémentation du cache côté client",
+      "Synchronisation manuelle avec les données serveur",
+      "Race conditions lors de requêtes multiples"
+    ]
+  },
+  when: {
+    idealCases: [
+      {
+        title: "Applications data-intensive",
+        description: "Dashboards, admin panels, CRM - tout ce qui affiche beaucoup de données provenant d'APIs.",
+        example: "useQuery({ queryKey: ['users'], queryFn: fetchUsers })"
+      },
+      {
+        title: "Listes avec pagination/infinite scroll",
+        description: "Feeds sociaux, catalogues produits, résultats de recherche.",
+        example: "useInfiniteQuery pour charger plus de données au scroll"
+      },
+      {
+        title: "Données partagées entre composants",
+        description: "Plusieurs composants affichent les mêmes données (user profile dans header et sidebar).",
+        example: "Le cache partage automatiquement les données entre composants"
+      },
+      {
+        title: "Applications temps réel ou fréquemment mises à jour",
+        description: "Prix de bourse, notifications, statuts en temps réel.",
+        example: "refetchInterval: 5000 pour polling automatique"
+      }
+    ],
+    avoidCases: [
+      {
+        title: "État purement client-side",
+        description: "Pour l'état UI local (modals ouverts, thème), utilisez useState ou Zustand.",
+        example: "Ne pas stocker isModalOpen dans React Query"
+      },
+      {
+        title: "Applications avec Server Components principalement",
+        description: "Si vous fetchez tout côté serveur avec RSC, React Query peut être redondant.",
+        example: "Pages statiques ou SSR où le cache serveur suffit"
+      },
+      {
+        title: "Très petites applications",
+        description: "Pour une app avec 1-2 endpoints simples, fetch + useState peut suffire.",
+        example: "Site vitrine avec juste un formulaire de contact"
+      }
+    ],
+    realWorldExamples: [
+      {
+        title: "Dashboard analytics",
+        description: "Métriques, graphiques, tableaux avec refresh automatique et cache intelligent.",
+        example: "useQuery(['metrics', dateRange], fetchMetrics, { staleTime: 60000 })"
+      },
+      {
+        title: "E-commerce - Liste de produits",
+        description: "Filtres, tri, pagination avec prefetch des pages suivantes.",
+        example: "useQuery(['products', filters], fetchProducts) + prefetch page suivante"
+      },
+      {
+        title: "Système de commentaires",
+        description: "Liste de commentaires avec ajout optimiste et invalidation après mutation.",
+        example: "useMutation + queryClient.setQueryData pour optimistic update"
+      },
+      {
+        title: "Recherche avec autocomplete",
+        description: "Suggestions en temps réel avec debounce et cache des résultats.",
+        example: "useQuery(['search', debouncedTerm], search, { enabled: term.length > 2 })"
+      },
+      {
+        title: "Profil utilisateur",
+        description: "Données utilisateur cachées et partagées entre header, sidebar, et page profil.",
+        example: "useQuery(['user', userId]) utilisé dans plusieurs composants"
+      },
+      {
+        title: "Feed social infini",
+        description: "Infinite scroll avec maintien de la position, prefetch, et nouveaux posts.",
+        example: "useInfiniteQuery(['feed'], fetchFeedPage, { getNextPageParam })"
+      }
+    ]
+  }
+};
 
 // Types
 interface User {
@@ -614,16 +714,31 @@ function CacheManagementExample() {
 // Main component with QueryClient provider
 function TanStackQueryContent() {
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold mb-4">TanStack Query (React Query)</h1>
-        <p className="text-xl text-muted-foreground">
-          Maîtrisez la gestion d'état serveur avec TanStack Query : requêtes, mutations, cache et SSR.
-        </p>
+    <div className="min-h-screen">
+      {/* Header */}
+      <div className="border-b border-border bg-card/50">
+        <div className="container mx-auto px-4 py-12 md:py-16">
+          <div className="max-w-3xl">
+            <Badge variant="secondary" className="mb-4 text-xs tracking-wider uppercase">
+              Data Fetching
+            </Badge>
+            <h1 className="mb-4">TanStack Query</h1>
+            <p className="text-lg text-muted-foreground leading-relaxed">
+              Maîtrisez la gestion d&apos;état serveur avec TanStack Query : requêtes, mutations, cache et SSR.
+            </p>
+            <div className="w-12 h-1 bg-accent mt-6" />
+          </div>
+        </div>
       </div>
 
-      <Tabs defaultValue="basics" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2 lg:grid-cols-6">
+      <div className="container mx-auto px-4 py-8 md:py-12">
+      <Tabs defaultValue="why-when" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-4 lg:grid-cols-7">
+          <TabsTrigger value="why-when" className="flex items-center gap-1">
+            <HelpCircle className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Pourquoi/Quand</span>
+            <span className="sm:hidden">?</span>
+          </TabsTrigger>
           <TabsTrigger value="basics">Basics</TabsTrigger>
           <TabsTrigger value="queries">Queries</TabsTrigger>
           <TabsTrigger value="mutations">Mutations</TabsTrigger>
@@ -631,6 +746,10 @@ function TanStackQueryContent() {
           <TabsTrigger value="cache">Cache</TabsTrigger>
           <TabsTrigger value="examples">Exemples</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="why-when">
+          <WhyWhenTabs why={tanstackQueryWhyWhen.why} when={tanstackQueryWhyWhen.when} />
+        </TabsContent>
 
         <TabsContent value="basics" className="space-y-6">
           <Card>
@@ -1219,6 +1338,7 @@ function useAdvancedSearch() {
           </Card>
         </TabsContent>
       </Tabs>
+      </div>
     </div>
   );
 }

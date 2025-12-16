@@ -3,15 +3,115 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { CodeExample } from '@/components/code-example';
-import { 
-  Server, 
-  Monitor, 
-  Database, 
+import { WhyWhenTabs } from '@/components/why-when-tabs';
+import {
+  Server,
+  Monitor,
+  Database,
   Clock,
   Users,
   TrendingUp,
-  Loader2
+  Loader2,
+  HelpCircle
 } from 'lucide-react';
+
+const serverComponentsWhyWhen = {
+  why: {
+    title: "Pourquoi les Server Components ?",
+    description: "Les React Server Components (RSC) représentent un changement de paradigme majeur. Ils permettent de rendre des composants entièrement sur le serveur, réduisant drastiquement le JavaScript envoyé au client tout en gardant accès direct aux ressources serveur (bases de données, système de fichiers, APIs internes).",
+    benefits: [
+      "Zero JavaScript envoyé au client pour les composants serveur",
+      "Accès direct aux bases de données et APIs sans exposition côté client",
+      "Meilleur SEO grâce au rendu HTML complet côté serveur",
+      "Réduction significative du bundle JavaScript (jusqu'à 50-70%)",
+      "Streaming et rendu progressif avec Suspense intégré",
+      "Sécurité améliorée : secrets et tokens restent sur le serveur",
+      "Colocation du data fetching avec les composants",
+      "Meilleure performance initiale (Time to First Byte)"
+    ],
+    problemsSolved: [
+      "Bundle JavaScript trop volumineux ralentissant le chargement",
+      "Waterfall de requêtes API côté client",
+      "Exposition de tokens/secrets dans le code client",
+      "Double travail : SSR puis hydratation avec le même code",
+      "Complexité de la synchronisation état serveur/client",
+      "SEO limité avec les SPAs traditionnelles"
+    ]
+  },
+  when: {
+    idealCases: [
+      {
+        title: "Affichage de données statiques ou peu fréquemment mises à jour",
+        description: "Listes de produits, articles de blog, pages de documentation - tout contenu qui ne nécessite pas d'interactivité immédiate.",
+        example: "async function ProductList() { const products = await db.products.findMany(); return <ul>{...}</ul> }"
+      },
+      {
+        title: "Pages nécessitant un accès direct à la base de données",
+        description: "Au lieu d'une API route puis d'un fetch côté client, accédez directement à la DB dans le composant.",
+        example: "const user = await prisma.user.findUnique({ where: { id } })"
+      },
+      {
+        title: "Composants lourds côté rendu mais sans interactivité",
+        description: "Graphiques statiques, tableaux de données, markdown rendu - pas besoin de JavaScript côté client.",
+        example: "Composant de syntaxe highlighting, rendu MDX, tableaux read-only"
+      },
+      {
+        title: "Contenus personnalisés par utilisateur (avec cookies/headers)",
+        description: "Dashboards personnalisés, recommandations, contenus géolocalisés.",
+        example: "const locale = cookies().get('locale'); const content = await getContent(locale)"
+      }
+    ],
+    avoidCases: [
+      {
+        title: "Composants avec état interactif",
+        description: "Formulaires, modals, dropdowns, accordéons - tout ce qui utilise useState, useReducer, ou des event handlers.",
+        example: "Utilisez 'use client' pour onClick, onChange, useState"
+      },
+      {
+        title: "Composants utilisant des hooks de browser",
+        description: "useEffect pour des effets côté client, localStorage, window.addEventListener.",
+        example: "useEffect(() => { window.scrollTo(0, 0) }, []) // Nécessite 'use client'"
+      },
+      {
+        title: "Composants temps réel avec WebSockets",
+        description: "Chat, notifications push, curseurs collaboratifs - nécessitent une connexion client persistante.",
+        example: "useEffect(() => { socket.on('message', ...) }, [])"
+      }
+    ],
+    realWorldExamples: [
+      {
+        title: "Page produit e-commerce",
+        description: "Le détail produit (nom, prix, description) en Server Component, les boutons 'Ajouter au panier' et 'Favoris' en Client Component.",
+        example: "Server: ProductDetails → Client: AddToCartButton, WishlistButton"
+      },
+      {
+        title: "Dashboard analytics",
+        description: "Les graphiques et statistiques calculés sur le serveur, les filtres interactifs en Client Component.",
+        example: "Server: RevenueChart, UserStats → Client: DateRangePicker, FilterSidebar"
+      },
+      {
+        title: "Blog avec commentaires",
+        description: "L'article et la liste de commentaires en Server Component, le formulaire d'ajout en Client Component.",
+        example: "Server: Article, CommentList → Client: CommentForm, LikeButton"
+      },
+      {
+        title: "Système de recherche",
+        description: "Les résultats de recherche en Server Component (SSR pour SEO), la barre de recherche avec autocomplete en Client Component.",
+        example: "Server: SearchResults → Client: SearchInput avec debounce"
+      },
+      {
+        title: "Page de profil utilisateur",
+        description: "Les données du profil récupérées côté serveur, les boutons d'édition et upload de photo en Client Component.",
+        example: "Server: ProfileInfo, ActivityFeed → Client: EditProfileForm, AvatarUpload"
+      },
+      {
+        title: "Documentation technique",
+        description: "Le contenu MDX rendu sur le serveur avec syntax highlighting, la table des matières interactive en Client.",
+        example: "Server: MDXContent, CodeBlock → Client: TableOfContents, CopyButton"
+      }
+    ]
+  }
+};
 
 // Server Component - Simple Data Fetching
 async function SimpleServerData() {
@@ -109,21 +209,40 @@ function LoadingCard() {
 
 export default function ServerComponentsPage() {
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold mb-4">Server Components</h1>
-        <p className="text-xl text-muted-foreground">
-          Learn the difference between Server and Client Components, data fetching patterns, and optimization techniques.
-        </p>
+    <div className="min-h-screen">
+      {/* Header */}
+      <div className="border-b border-border bg-card/50">
+        <div className="container mx-auto px-4 py-12 md:py-16">
+          <div className="max-w-3xl">
+            <Badge variant="secondary" className="mb-4 text-xs tracking-wider uppercase">
+              Architecture
+            </Badge>
+            <h1 className="mb-4">Server Components</h1>
+            <p className="text-lg text-muted-foreground leading-relaxed">
+              Learn the difference between Server and Client Components, data fetching patterns, and optimization techniques.
+            </p>
+            <div className="w-12 h-1 bg-accent mt-6" />
+          </div>
+        </div>
       </div>
 
-      <Tabs defaultValue="basics" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4">
+      <div className="container mx-auto px-4 py-8 md:py-12">
+      <Tabs defaultValue="why-when" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-3 lg:grid-cols-5">
+          <TabsTrigger value="why-when" className="flex items-center gap-1">
+            <HelpCircle className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Pourquoi/Quand</span>
+            <span className="sm:hidden">?</span>
+          </TabsTrigger>
           <TabsTrigger value="basics">Basics</TabsTrigger>
           <TabsTrigger value="simple">Simple Example</TabsTrigger>
           <TabsTrigger value="complex">Complex Example</TabsTrigger>
           <TabsTrigger value="patterns">Patterns</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="why-when">
+          <WhyWhenTabs why={serverComponentsWhyWhen.why} when={serverComponentsWhyWhen.when} />
+        </TabsContent>
 
         <TabsContent value="basics" className="space-y-6">
           <Card>
@@ -477,6 +596,7 @@ async function DataComponent() {
           </Card>
         </TabsContent>
       </Tabs>
+      </div>
     </div>
   );
 }

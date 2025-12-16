@@ -9,9 +9,10 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { CodeExample } from '@/components/code-example';
-import { 
-  Zap, 
-  MessageCircle, 
+import { WhyWhenTabs } from '@/components/why-when-tabs';
+import {
+  Zap,
+  MessageCircle,
   Heart,
   ThumbsUp,
   Plus,
@@ -22,9 +23,107 @@ import {
   Clock,
   User,
   Calendar,
-  Loader2
+  Loader2,
+  HelpCircle
 } from 'lucide-react';
 import { toast } from 'sonner';
+
+const useOptimisticWhyWhen = {
+  why: {
+    title: "Pourquoi useOptimistic ?",
+    description: "useOptimistic est un hook React 19 qui permet d'afficher un état temporaire pendant qu'une action asynchrone est en cours. Il donne l'illusion d'une réponse instantanée, améliorant drastiquement la perception de performance et l'expérience utilisateur.",
+    benefits: [
+      "Interface qui répond instantanément aux actions utilisateur",
+      "Perception de performance améliorée même avec un serveur lent",
+      "Rollback automatique en cas d'erreur",
+      "API simple et intégrée à React 19",
+      "Fonctionne parfaitement avec les Server Actions",
+      "Pas besoin de bibliothèques tierces",
+      "Gestion élégante des états intermédiaires",
+      "Améliore le Largest Contentful Paint (LCP) perçu"
+    ],
+    problemsSolved: [
+      "Latence perçue lors des appels réseau",
+      "UI 'gelée' pendant les opérations asynchrones",
+      "Expérience utilisateur dégradée sur réseaux lents",
+      "Complexité de gestion des états optimistes manuels",
+      "Incohérence entre l'état affiché et l'état serveur"
+    ]
+  },
+  when: {
+    idealCases: [
+      {
+        title: "Likes et réactions",
+        description: "Le cœur se remplit immédiatement au clic, même si la requête prend 500ms.",
+        example: "const [optimisticLiked, setOptimisticLiked] = useOptimistic(liked)"
+      },
+      {
+        title: "Ajout/suppression d'éléments",
+        description: "La todo apparaît instantanément dans la liste, puis se synchronise avec le serveur.",
+        example: "Todo list, bookmarks, playlist"
+      },
+      {
+        title: "Formulaires de commentaires",
+        description: "Le commentaire s'affiche immédiatement avec un indicateur 'envoi en cours'.",
+        example: "Section commentaires d'un blog ou d'un réseau social"
+      },
+      {
+        title: "Toggle de paramètres",
+        description: "Le switch se positionne immédiatement, sauvegarde en arrière-plan.",
+        example: "Activer/désactiver notifications, dark mode, etc."
+      }
+    ],
+    avoidCases: [
+      {
+        title: "Opérations critiques",
+        description: "Pour les paiements ou actions irréversibles, attendez la confirmation serveur.",
+        example: "Paiement, suppression définitive de compte"
+      },
+      {
+        title: "Opérations avec validation serveur complexe",
+        description: "Si le serveur peut rejeter l'action pour des raisons non prédictibles.",
+        example: "Stock insuffisant, permissions dynamiques"
+      },
+      {
+        title: "Actions très longues",
+        description: "Pour des processus de plusieurs secondes, un indicateur de progression est préférable.",
+        example: "Upload de gros fichiers, génération de rapports"
+      }
+    ],
+    realWorldExamples: [
+      {
+        title: "Like Instagram/Twitter",
+        description: "Le cœur se remplit au tap, se vide si erreur serveur, avec animation.",
+        example: "useOptimistic → Server Action → toast.error si échec"
+      },
+      {
+        title: "Panier e-commerce",
+        description: "La quantité se met à jour instantanément, le badge header aussi.",
+        example: "updateQuantity optimiste → vérification stock → rollback si rupture"
+      },
+      {
+        title: "Messages de chat",
+        description: "Le message apparaît avec 'envoi...' puis '✓' quand confirmé par le serveur.",
+        example: "Message pending → confirmed → ou erreur avec retry"
+      },
+      {
+        title: "Favoris/Bookmarks",
+        description: "L'étoile jaunit immédiatement, synchronisation en background.",
+        example: "Toggle bookmark avec état optimiste"
+      },
+      {
+        title: "Réorganisation (drag & drop)",
+        description: "L'ordre se met à jour pendant le drag, persiste au drop.",
+        example: "Réorganisation de cards, playlists, kanban"
+      },
+      {
+        title: "Édition inline",
+        description: "Le texte se met à jour pendant la frappe, sauvegarde au blur.",
+        example: "Édition de titre, description, tags"
+      }
+    ]
+  }
+};
 
 // Types
 interface Message {
@@ -656,22 +755,40 @@ function OptimisticPostForm() {
 
 export default function UseOptimisticPage() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
-      <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold mb-4">useOptimistic Hook</h1>
-        <p className="text-xl text-muted-foreground">
-          Créez des interfaces utilisateur réactives avec des mises à jour optimistes qui s'annulent automatiquement en cas d'erreur.
-        </p>
+    <div className="min-h-screen">
+      {/* Header */}
+      <div className="border-b border-border bg-card/50">
+        <div className="container mx-auto px-4 py-12 md:py-16">
+          <div className="max-w-3xl">
+            <Badge variant="secondary" className="mb-4 text-xs tracking-wider uppercase">
+              React 19
+            </Badge>
+            <h1 className="mb-4">useOptimistic Hook</h1>
+            <p className="text-lg text-muted-foreground leading-relaxed">
+              Créez des interfaces utilisateur réactives avec des mises à jour optimistes qui s&apos;annulent automatiquement en cas d&apos;erreur.
+            </p>
+            <div className="w-12 h-1 bg-accent mt-6" />
+          </div>
+        </div>
       </div>
 
-      <Tabs defaultValue="basics" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4">
+      <div className="container mx-auto px-4 py-8 md:py-12">
+      <Tabs defaultValue="why-when" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-3 lg:grid-cols-5">
+          <TabsTrigger value="why-when" className="flex items-center gap-1">
+            <HelpCircle className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Pourquoi/Quand</span>
+            <span className="sm:hidden">?</span>
+          </TabsTrigger>
           <TabsTrigger value="basics">Basics</TabsTrigger>
           <TabsTrigger value="chat">Chat Simple</TabsTrigger>
           <TabsTrigger value="todos">Todo List</TabsTrigger>
           <TabsTrigger value="posts">Posts Complexes</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="why-when">
+          <WhyWhenTabs why={useOptimisticWhyWhen.why} when={useOptimisticWhyWhen.when} />
+        </TabsContent>
 
         <TabsContent value="basics" className="space-y-6">
           <Card>

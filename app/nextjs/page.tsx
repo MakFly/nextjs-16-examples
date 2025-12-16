@@ -5,12 +5,13 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { CodeExample } from '@/components/code-example';
 import { FileTree } from '@/components/file-tree';
-import { 
-  FolderIcon, 
-  FileIcon, 
-  Layout, 
-  Route, 
-  Loader, 
+import { WhyWhenTabs } from '@/components/why-when-tabs';
+import {
+  FolderIcon,
+  FileIcon,
+  Layout,
+  Route,
+  Loader,
   AlertTriangle,
   ShoppingCart,
   User,
@@ -20,9 +21,109 @@ import {
   Database,
   Clock,
   ExternalLink,
-  ArrowRight
+  ArrowRight,
+  HelpCircle
 } from 'lucide-react';
 import Link from 'next/link';
+
+const nextjsWhyWhen = {
+  why: {
+    title: "Pourquoi Next.js App Router ?",
+    description: "Next.js App Router représente une évolution majeure du framework, offrant une architecture basée sur React Server Components, un routing plus intuitif basé sur les fichiers, et des fonctionnalités avancées comme le streaming et les layouts imbriqués. C'est le choix idéal pour construire des applications web modernes, performantes et évolutives.",
+    benefits: [
+      "Server Components par défaut : réduction drastique du JavaScript envoyé au client",
+      "Routing intuitif basé sur les dossiers et fichiers",
+      "Layouts imbriqués avec conservation de l'état entre les navigations",
+      "Streaming et Suspense intégrés pour un chargement progressif",
+      "Métadonnées et SEO optimisés avec l'API metadata",
+      "Support natif de TypeScript avec typage automatique des routes",
+      "Optimisation automatique des images, fonts et scripts",
+      "Middleware puissant pour la gestion des requêtes"
+    ],
+    problemsSolved: [
+      "Complexité du routing dans les grandes applications React",
+      "Performance initiale lente due au bundle JavaScript volumineux",
+      "Gestion manuelle du SEO et des métadonnées",
+      "Configuration complexe du Server-Side Rendering",
+      "État partagé difficile entre les pages",
+      "Chargement en cascade des données (waterfall)",
+      "Manque de conventions dans la structure des projets React"
+    ]
+  },
+  when: {
+    idealCases: [
+      {
+        title: "Sites web et applications avec SEO critique",
+        description: "E-commerce, blogs, sites marketing où le référencement naturel est crucial. Le SSR et les métadonnées optimisées garantissent une indexation parfaite.",
+        example: "Site e-commerce avec pages produits indexées, blog d'entreprise, landing pages marketing"
+      },
+      {
+        title: "Applications avec beaucoup de contenu dynamique",
+        description: "Dashboards, portails clients, applications SaaS où le contenu change fréquemment et doit être à jour.",
+        example: "Dashboard analytics, plateforme de gestion de projet, CRM"
+      },
+      {
+        title: "Projets nécessitant des performances optimales",
+        description: "Applications où le Time to First Byte (TTFB) et le Largest Contentful Paint (LCP) sont critiques.",
+        example: "Applications mobiles web (PWA), sites à fort trafic, applications temps réel"
+      },
+      {
+        title: "Équipes cherchant des conventions établies",
+        description: "Projets d'équipe où une structure claire et des conventions réduisent les frictions et accélèrent le développement.",
+        example: "Startups en croissance, équipes enterprise, projets open source"
+      }
+    ],
+    avoidCases: [
+      {
+        title: "Applications purement client-side (SPA)",
+        description: "Si vous n'avez pas besoin de SEO et que tout se passe côté client, un framework plus léger comme Vite + React peut suffire.",
+        example: "Outils internes, applications derrière authentification, dashboards privés"
+      },
+      {
+        title: "Prototypes très simples",
+        description: "Pour un MVP rapide d'une seule page sans complexité de routing, Next.js peut être overkill.",
+        example: "Landing page statique simple, prototype de démo"
+      },
+      {
+        title: "Applications nécessitant un contrôle total du serveur",
+        description: "Si vous avez besoin d'un backend personnalisé complexe, considérez une architecture séparée frontend/backend.",
+        example: "API complexes avec microservices, applications temps réel avec WebSockets intensifs"
+      }
+    ],
+    realWorldExamples: [
+      {
+        title: "Blog/CMS (comme ce tutoriel)",
+        description: "Routing dynamique [slug], métadonnées automatiques, génération statique des pages populaires, ISR pour le contenu mis à jour.",
+        example: "/blog/[slug] → SSG + ISR"
+      },
+      {
+        title: "E-commerce",
+        description: "Pages produits avec SSR pour le SEO, panier côté client, checkout avec Server Actions, recherche avec streaming.",
+        example: "/products/[id] → SSR, /cart → Client, /checkout → Server Actions"
+      },
+      {
+        title: "Dashboard SaaS",
+        description: "Layout avec sidebar persistante, pages de données avec Suspense, formulaires avec validation Zod et Server Actions.",
+        example: "/(dashboard)/analytics → Parallel Routes, /(dashboard)/settings → Forms"
+      },
+      {
+        title: "Marketplace",
+        description: "Listings avec filtres (searchParams), profils vendeurs, messagerie temps réel, paiements sécurisés.",
+        example: "/listings?category=X&price=Y → SSR avec searchParams"
+      },
+      {
+        title: "Application multi-tenant",
+        description: "Subdomains ou paths par tenant, layouts personnalisés, isolation des données.",
+        example: "/[tenant]/dashboard → Middleware + Dynamic Routes"
+      },
+      {
+        title: "Documentation technique",
+        description: "MDX pour le contenu, navigation latérale, recherche full-text, versioning.",
+        example: "/docs/[...slug] → Catch-all routes + MDX"
+      }
+    ]
+  }
+};
 
 // Simulated data fetching components
 async function BlogPosts() {
@@ -30,7 +131,7 @@ async function BlogPosts() {
   await new Promise(resolve => setTimeout(resolve, 1000));
   
   const posts = [
-    { id: 1, title: "Getting Started with Next.js 15", slug: "getting-started-nextjs-15", excerpt: "Learn the basics of Next.js App Router", date: "2024-01-15" },
+    { id: 1, title: "Getting Started with Next.js 16", slug: "getting-started-nextjs-16", excerpt: "Learn the basics of Next.js App Router", date: "2024-01-15" },
     { id: 2, title: "Advanced Server Components", slug: "advanced-server-components", excerpt: "Deep dive into server-side rendering", date: "2024-01-10" },
     { id: 3, title: "Building Modern Web Apps", slug: "building-modern-web-apps", excerpt: "Best practices for modern development", date: "2024-01-05" }
   ];
@@ -156,23 +257,42 @@ function ProductSkeleton() {
 
 export default function NextjsPage() {
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold mb-4">Next.js App Router</h1>
-        <p className="text-xl text-muted-foreground">
-          Exemples concrets d'utilisation de Next.js App Router avec des cas d'usage réels : 
-          blog, e-commerce, dashboard, et plus encore.
-        </p>
+    <div className="min-h-screen">
+      {/* Header */}
+      <div className="border-b border-border bg-card/50">
+        <div className="container mx-auto px-4 py-12 md:py-16">
+          <div className="max-w-3xl">
+            <Badge variant="secondary" className="mb-4 text-xs tracking-wider uppercase">
+              Core
+            </Badge>
+            <h1 className="mb-4">Next.js App Router</h1>
+            <p className="text-lg text-muted-foreground leading-relaxed">
+              Exemples concrets d&apos;utilisation de Next.js App Router avec des cas d&apos;usage réels :
+              blog, e-commerce, dashboard, et plus encore.
+            </p>
+            <div className="w-12 h-1 bg-accent mt-6" />
+          </div>
+        </div>
       </div>
 
-      <Tabs defaultValue="routing" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2 lg:grid-cols-5">
+      <div className="container mx-auto px-4 py-8 md:py-12">
+      <Tabs defaultValue="why-when" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6">
+          <TabsTrigger value="why-when" className="flex items-center gap-1">
+            <HelpCircle className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Pourquoi/Quand</span>
+            <span className="sm:hidden">?</span>
+          </TabsTrigger>
           <TabsTrigger value="routing">Routing</TabsTrigger>
           <TabsTrigger value="layouts">Layouts</TabsTrigger>
           <TabsTrigger value="loading">Loading</TabsTrigger>
           <TabsTrigger value="examples">Exemples</TabsTrigger>
           <TabsTrigger value="patterns">Patterns</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="why-when">
+          <WhyWhenTabs why={nextjsWhyWhen.why} when={nextjsWhyWhen.when} />
+        </TabsContent>
 
         <TabsContent value="routing" className="space-y-6">
           <Card>
@@ -1073,6 +1193,7 @@ export default function RootLayout({ children }) {
           </Card>
         </TabsContent>
       </Tabs>
+      </div>
     </div>
   );
 }

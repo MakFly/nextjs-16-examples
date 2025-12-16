@@ -1,10 +1,12 @@
 'use client';
 
 import { useState } from 'react';
+import { useTheme } from 'next-themes';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Copy, Check } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { oneLight, oneDark } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 interface CodeExampleProps {
   title: string;
@@ -14,6 +16,9 @@ interface CodeExampleProps {
 
 export function CodeExample({ title, code, language = 'typescript' }: CodeExampleProps) {
   const [copied, setCopied] = useState(false);
+  const { theme, systemTheme } = useTheme();
+  const currentTheme = theme === 'system' ? systemTheme : theme;
+  const isDark = currentTheme === 'dark';
 
   const copyToClipboard = async () => {
     await navigator.clipboard.writeText(code);
@@ -38,10 +43,27 @@ export function CodeExample({ title, code, language = 'typescript' }: CodeExampl
           )}
         </Button>
       </CardHeader>
-      <CardContent>
-        <pre className="overflow-x-auto rounded-lg bg-muted p-4 text-sm">
-          <code className={cn("language-" + language)}>{code}</code>
-        </pre>
+      <CardContent className="p-0">
+        <div className="overflow-hidden rounded-lg">
+          <SyntaxHighlighter
+            language={language}
+            style={isDark ? oneDark : oneLight}
+            customStyle={{
+              margin: 0,
+              padding: '1rem',
+              fontSize: '0.875rem',
+              lineHeight: '1.5',
+              fontFamily: 'var(--font-mono)',
+            }}
+            codeTagProps={{
+              style: {
+                fontFamily: 'var(--font-mono)',
+              },
+            }}
+          >
+            {code}
+          </SyntaxHighlighter>
+        </div>
       </CardContent>
     </Card>
   );

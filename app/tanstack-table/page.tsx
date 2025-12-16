@@ -26,6 +26,7 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
 import { CodeExample } from '@/components/code-example';
+import { WhyWhenTabs } from '@/components/why-when-tabs';
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -65,7 +66,106 @@ import {
   DollarSign,
   TrendingUp,
   TrendingDown,
+  HelpCircle,
 } from 'lucide-react';
+
+const tanstackTableWhyWhen = {
+  why: {
+    title: "Pourquoi TanStack Table ?",
+    description: "TanStack Table est la bibliothèque de tableaux la plus puissante et flexible pour React. Headless par design, elle fournit toute la logique (tri, filtrage, pagination, groupement) sans imposer de style, vous donnant un contrôle total sur le rendu tout en gérant la complexité.",
+    benefits: [
+      "Headless : contrôle total sur le markup et les styles",
+      "Tri multi-colonnes avec direction personnalisable",
+      "Filtrage global et par colonne",
+      "Pagination côté client ou serveur",
+      "Groupement et agrégation de données",
+      "Sélection de lignes avec checkbox",
+      "Colonnes redimensionnables et réordonnables",
+      "Virtualisation pour des milliers de lignes",
+      "TypeScript-first avec typage complet"
+    ],
+    problemsSolved: [
+      "Tableaux avec tri/filtre/pagination maison complexes à maintenir",
+      "Libraries de tableaux avec styles imposés difficiles à personnaliser",
+      "Performance dégradée sur de gros datasets",
+      "Logique de tableau dupliquée entre projets",
+      "Gestion complexe de l'état des colonnes (visibilité, ordre, taille)"
+    ]
+  },
+  when: {
+    idealCases: [
+      {
+        title: "Tableaux de données complexes",
+        description: "Back-office, admin panels, CRM avec tri, filtrage, et pagination.",
+        example: "Liste d'utilisateurs, commandes, produits avec actions"
+      },
+      {
+        title: "Rapports et analytics",
+        description: "Tableaux avec groupement, agrégation, et export de données.",
+        example: "Rapport de ventes par région, période, produit"
+      },
+      {
+        title: "Tableaux avec sélection",
+        description: "Actions en masse sur plusieurs lignes sélectionnées.",
+        example: "Sélectionner 10 utilisateurs → actions groupées (supprimer, exporter)"
+      },
+      {
+        title: "Grilles de données éditables",
+        description: "Cellules éditables inline avec validation.",
+        example: "Spreadsheet-like pour édition de prix, stocks, etc."
+      }
+    ],
+    avoidCases: [
+      {
+        title: "Tableaux très simples",
+        description: "Pour un tableau statique de 5-10 lignes sans interaction, un simple <table> HTML suffit.",
+        example: "Tableau de pricing, liste de features"
+      },
+      {
+        title: "Affichage de cards/grid",
+        description: "Si vous n'avez pas besoin d'un format tabulaire, utilisez un simple map() avec des cards.",
+        example: "Galerie de produits, liste de cards utilisateurs"
+      },
+      {
+        title: "Besoin d'un tableau prêt à l'emploi",
+        description: "Si vous voulez un tableau stylé out-of-the-box, préférez AG Grid ou une solution avec UI incluse.",
+        example: "Prototype rapide sans temps pour le styling"
+      }
+    ],
+    realWorldExamples: [
+      {
+        title: "Liste d'utilisateurs admin",
+        description: "Nom, email, rôle, date d'inscription avec tri, recherche, et actions (éditer, supprimer, bloquer).",
+        example: "Filtrage par rôle, tri par date, pagination serveur"
+      },
+      {
+        title: "Historique de commandes",
+        description: "Numéro, client, montant, statut avec filtres par date et statut, groupement par mois.",
+        example: "Groupement par mois, sous-totaux, export CSV"
+      },
+      {
+        title: "Gestion de stock",
+        description: "Produits avec SKU, quantité, prix, alertes de stock bas, édition inline.",
+        example: "Cellules éditables, validation, sauvegarde auto"
+      },
+      {
+        title: "Logs et événements",
+        description: "Timestamp, type, message avec filtrage, recherche full-text, virtualisation pour des milliers de lignes.",
+        example: "Virtualisation avec react-virtual, filtrage temps réel"
+      },
+      {
+        title: "Tableau de bord RH",
+        description: "Employés avec département, manager, salaire, congés avec groupement et agrégations.",
+        example: "Groupement par département, moyenne de salaire, total congés"
+      },
+      {
+        title: "Comparateur de produits",
+        description: "Caractéristiques en lignes, produits en colonnes avec highlight des différences.",
+        example: "Colonnes dynamiques, cellules colorées selon valeurs"
+      }
+    ]
+  }
+};
 import { toast } from 'sonner';
 
 // Types pour les données
@@ -921,22 +1021,41 @@ function GroupedTable() {
 
 export default function TanStackTablePage() {
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold mb-4">TanStack Table</h1>
-        <p className="text-xl text-muted-foreground">
-          Maîtrisez les tableaux avancés avec TanStack Table : tri, filtrage, pagination, groupement et plus encore.
-        </p>
+    <div className="min-h-screen">
+      {/* Header */}
+      <div className="border-b border-border bg-card/50">
+        <div className="container mx-auto px-4 py-12 md:py-16">
+          <div className="max-w-3xl">
+            <Badge variant="secondary" className="mb-4 text-xs tracking-wider uppercase">
+              Tables
+            </Badge>
+            <h1 className="mb-4">TanStack Table</h1>
+            <p className="text-lg text-muted-foreground leading-relaxed">
+              Maîtrisez les tableaux avancés avec TanStack Table : tri, filtrage, pagination, groupement et plus encore.
+            </p>
+            <div className="w-12 h-1 bg-accent mt-6" />
+          </div>
+        </div>
       </div>
 
-      <Tabs defaultValue="basics" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2 lg:grid-cols-5">
+      <div className="container mx-auto px-4 py-8 md:py-12">
+      <Tabs defaultValue="why-when" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-3 lg:grid-cols-6">
+          <TabsTrigger value="why-when" className="flex items-center gap-1">
+            <HelpCircle className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Pourquoi/Quand</span>
+            <span className="sm:hidden">?</span>
+          </TabsTrigger>
           <TabsTrigger value="basics">Basics</TabsTrigger>
           <TabsTrigger value="simple">Table Simple</TabsTrigger>
           <TabsTrigger value="advanced">Table Avancée</TabsTrigger>
           <TabsTrigger value="grouped">Groupement</TabsTrigger>
           <TabsTrigger value="patterns">Patterns</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="why-when">
+          <WhyWhenTabs why={tanstackTableWhyWhen.why} when={tanstackTableWhyWhen.when} />
+        </TabsContent>
 
         <TabsContent value="basics" className="space-y-6">
           <Card>
@@ -1563,6 +1682,7 @@ function exportToJSON(table: Table<any>, filename: string) {
           </Card>
         </TabsContent>
       </Tabs>
+      </div>
     </div>
   );
 }

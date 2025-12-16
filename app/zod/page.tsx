@@ -10,9 +10,108 @@ import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
 import { CodeExample } from '@/components/code-example';
 import { Badge } from '@/components/ui/badge';
+import { WhyWhenTabs } from '@/components/why-when-tabs';
 import { userSchema, blogPostSchema, type UserFormData } from '@/lib/validations/user';
 import { toast } from 'sonner';
-import { Shield, CheckCircle, XCircle } from 'lucide-react';
+import { Shield, CheckCircle, XCircle, HelpCircle } from 'lucide-react';
+
+const zodWhyWhen = {
+  why: {
+    title: "Pourquoi Zod ?",
+    description: "Zod est une bibliothèque de validation de schémas TypeScript-first qui permet de définir des schémas de données avec une inférence de type automatique. Contrairement aux validateurs traditionnels, Zod garantit que vos types TypeScript et vos validations runtime sont toujours synchronisés.",
+    benefits: [
+      "Inférence automatique des types TypeScript à partir des schémas",
+      "Validation runtime avec des messages d'erreur détaillés et personnalisables",
+      "Zero dépendances et bundle très léger (~12kb minifié)",
+      "API composable et chaînable pour des schémas complexes",
+      "Support natif des transformations de données",
+      "Intégration parfaite avec React Hook Form et tRPC",
+      "Schémas réutilisables et extensibles avec .extend(), .merge(), .pick()",
+      "Validation asynchrone pour les vérifications côté serveur"
+    ],
+    problemsSolved: [
+      "Duplication entre les types TypeScript et les validations runtime",
+      "Erreurs de validation peu descriptives et difficiles à déboguer",
+      "Validation incohérente entre le client et le serveur",
+      "Complexité de la validation de structures de données imbriquées",
+      "Manque de typage fort pour les données provenant d'APIs externes",
+      "Difficulté à maintenir la cohérence des schémas dans le temps"
+    ]
+  },
+  when: {
+    idealCases: [
+      {
+        title: "Validation de formulaires",
+        description: "Validation des entrées utilisateur avec des messages d'erreur clairs et une intégration directe avec React Hook Form.",
+        example: "z.object({ email: z.string().email(), password: z.string().min(8) })"
+      },
+      {
+        title: "Validation des réponses API",
+        description: "S'assurer que les données reçues d'une API correspondent au format attendu avant de les utiliser.",
+        example: "const user = userSchema.parse(await fetch('/api/user').then(r => r.json()))"
+      },
+      {
+        title: "Server Actions et API Routes",
+        description: "Valider les données entrantes dans les Server Actions Next.js ou les API routes pour garantir la sécurité.",
+        example: "export async function createPost(formData: FormData) { const data = postSchema.parse(...) }"
+      },
+      {
+        title: "Variables d'environnement",
+        description: "Valider et typer les variables d'environnement au démarrage de l'application.",
+        example: "z.object({ DATABASE_URL: z.string().url(), API_KEY: z.string().min(32) })"
+      }
+    ],
+    avoidCases: [
+      {
+        title: "Validations très simples",
+        description: "Pour une simple vérification de nullité ou de type basique, typeof ou optional chaining peuvent suffire.",
+        example: "if (value !== null) // Pas besoin de Zod pour ça"
+      },
+      {
+        title: "Gros volumes de données en temps réel",
+        description: "Pour des streams de données massifs où la performance est critique, une validation manuelle optimisée peut être préférable.",
+        example: "Parsing de logs en temps réel, traitement de flux vidéo"
+      },
+      {
+        title: "Projets sans TypeScript",
+        description: "Zod est conçu pour TypeScript. Sans TS, vous perdez l'avantage principal de l'inférence de types.",
+        example: "Projets JavaScript vanilla sans bundler"
+      }
+    ],
+    realWorldExamples: [
+      {
+        title: "Formulaire d'inscription",
+        description: "Validation complète avec email unique, mot de passe fort, confirmation, et acceptation des CGU.",
+        example: "z.object({...}).refine(d => d.password === d.confirm, 'Passwords must match')"
+      },
+      {
+        title: "Configuration d'application",
+        description: "Validation des fichiers de config JSON/YAML avec des valeurs par défaut et des transformations.",
+        example: "configSchema.parse(JSON.parse(fs.readFileSync('config.json')))"
+      },
+      {
+        title: "Webhook entrant",
+        description: "Valider les payloads de webhooks Stripe, GitHub, etc. avant traitement.",
+        example: "const event = stripeWebhookSchema.parse(req.body)"
+      },
+      {
+        title: "Import de données CSV/Excel",
+        description: "Valider chaque ligne d'un fichier importé avec des messages d'erreur par ligne.",
+        example: "rows.map((row, i) => schema.safeParse(row).error?.flatten())"
+      },
+      {
+        title: "GraphQL/tRPC inputs",
+        description: "Définir les schémas d'entrée pour les resolvers GraphQL ou les procédures tRPC.",
+        example: "t.procedure.input(z.object({ id: z.string().uuid() })).query(...)"
+      },
+      {
+        title: "Feature flags",
+        description: "Valider la structure des feature flags avec des valeurs par défaut.",
+        example: "z.object({ darkMode: z.boolean().default(false), betaFeatures: z.array(z.string()) })"
+      }
+    ]
+  }
+};
 
 export default function ZodPage() {
   const [formData, setFormData] = useState({
@@ -67,21 +166,40 @@ export default function ZodPage() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold mb-4">Zod Validation</h1>
-        <p className="text-xl text-muted-foreground">
-          Learn schema validation, form validation, and type safety with Zod.
-        </p>
+    <div className="min-h-screen">
+      {/* Header */}
+      <div className="border-b border-border bg-card/50">
+        <div className="container mx-auto px-4 py-12 md:py-16">
+          <div className="max-w-3xl">
+            <Badge variant="secondary" className="mb-4 text-xs tracking-wider uppercase">
+              Validation
+            </Badge>
+            <h1 className="mb-4">Zod Validation</h1>
+            <p className="text-lg text-muted-foreground leading-relaxed">
+              Learn schema validation, form validation, and type safety with Zod.
+            </p>
+            <div className="w-12 h-1 bg-accent mt-6" />
+          </div>
+        </div>
       </div>
 
-      <Tabs defaultValue="basics" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2 lg:grid-cols-4">
+      <div className="container mx-auto px-4 py-8 md:py-12">
+      <Tabs defaultValue="why-when" className="space-y-6">
+        <TabsList className="grid w-full grid-cols-3 lg:grid-cols-5">
+          <TabsTrigger value="why-when" className="flex items-center gap-1">
+            <HelpCircle className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline">Pourquoi/Quand</span>
+            <span className="sm:hidden">?</span>
+          </TabsTrigger>
           <TabsTrigger value="basics">Basics</TabsTrigger>
           <TabsTrigger value="schemas">Schemas</TabsTrigger>
           <TabsTrigger value="validation">Validation</TabsTrigger>
           <TabsTrigger value="advanced">Advanced</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="why-when">
+          <WhyWhenTabs why={zodWhyWhen.why} when={zodWhyWhen.when} />
+        </TabsContent>
 
         <TabsContent value="basics" className="space-y-6">
           <Card>
@@ -507,6 +625,7 @@ const ConditionalSchema = z.discriminatedUnion('type', [
           </Card>
         </TabsContent>
       </Tabs>
+      </div>
     </div>
   );
 }

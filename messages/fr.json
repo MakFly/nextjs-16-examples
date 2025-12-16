@@ -1,0 +1,163 @@
+{
+  "common": {
+    "navigation": {
+      "home": "Accueil",
+      "nextjs": "Next.js",
+      "zod": "Zod",
+      "zustand": "Zustand",
+      "tanstackQuery": "TanStack Query",
+      "tanstackTable": "TanStack Table",
+      "notifications": "Notifications",
+      "reactHookForm": "React Hook Form",
+      "serverComponents": "Server Components",
+      "serverActions": "Server Actions",
+      "useOptimistic": "useOptimistic",
+      "examples": "Exemples",
+      "blog": "Blog",
+      "ecommerce": "E-commerce",
+      "dashboard": "Dashboard",
+      "corporate": "Corporate",
+      "more": "Plus",
+      "advancedTopics": "Sujets Avancés",
+      "advanced": "Avancé",
+      "siteName": "Tutoriels Next.js",
+      "builtWith": "Créé avec Next.js 16"
+    },
+    "buttons": {
+      "startLearning": "Commencer",
+      "viewAll": "Voir Tous les Tutoriels",
+      "viewAllExamples": "Voir Tous les Exemples",
+      "readMore": "Lire Plus",
+      "subscribe": "S'abonner",
+      "validate": "Valider",
+      "save": "Enregistrer",
+      "cancel": "Annuler",
+      "edit": "Modifier",
+      "delete": "Supprimer",
+      "search": "Rechercher",
+      "loading": "Chargement...",
+      "error": "Une erreur est survenue",
+      "retry": "Réessayer"
+    },
+    "form": {
+      "name": "Nom",
+      "email": "Email",
+      "password": "Mot de passe",
+      "confirmPassword": "Confirmer le mot de passe",
+      "website": "Site web",
+      "bio": "Bio",
+      "age": "Âge",
+      "searchPlaceholder": "Rechercher...",
+      "subscribeToNewsletter": "S'abonner à la newsletter",
+      "acceptTerms": "J'accepte les termes et conditions",
+      "required": "Ce champ est requis",
+      "emailInvalid": "Veuillez entrer un email valide",
+      "passwordMismatch": "Les mots de passe ne correspondent pas"
+    },
+    "accessibility": {
+      "toggleTheme": "Changer le thème",
+      "toggleMenu": "Ouvrir le menu"
+    }
+  },
+  "home": {
+    "hero": {
+      "title": "Tutoriel Next.js App Router",
+      "description": "Maîtrisez le développement React moderne avec ce tutoriel complet couvrant Next.js App Router, la gestion d'état, les formulaires et les patterns avancés."
+    },
+    "tutorials": {
+      "nextjs": {
+        "title": "Next.js App Router",
+        "description": "Apprenez les fondamentaux de l'App Router, les layouts, les états de chargement et les error boundaries",
+        "badge": "Base"
+      },
+      "zod": {
+        "title": "Validation Zod",
+        "description": "Validation de schémas, validation de formulaires et typage sécurisé avec Zod",
+        "badge": "Validation"
+      },
+      "zustand": {
+        "title": "Gestion d'État Zustand",
+        "description": "Gestion d'état simple et évolutive avec Zustand",
+        "badge": "État"
+      },
+      "serverComponents": {
+        "title": "Server Components",
+        "description": "Composants Serveur vs Client, récupération de données et optimisation",
+        "badge": "Architecture"
+      },
+      "serverActions": {
+        "title": "Server Actions",
+        "description": "Gestion des formulaires, mutations et logique côté serveur",
+        "badge": "Actions"
+      },
+      "reactHookForm": {
+        "title": "React Hook Form",
+        "description": "Gestion avancée des formulaires avec validation et performance",
+        "badge": "Formulaires"
+      },
+      "tanstackQuery": {
+        "title": "TanStack Query",
+        "description": "Gestion de l'état serveur, cache et synchronisation",
+        "badge": "Données"
+      },
+      "tanstackTable": {
+        "title": "TanStack Table",
+        "description": "Tableaux avancés avec tri, filtrage, pagination et groupement",
+        "badge": "Tableaux"
+      },
+      "notifications": {
+        "title": "Notifications Toast",
+        "description": "Intégration Sonner et systèmes de notification personnalisés",
+        "badge": "UI/UX"
+      },
+      "useOptimistic": {
+        "title": "useOptimistic",
+        "description": "Mises à jour optimistes pour des interfaces réactives",
+        "badge": "React"
+      }
+    },
+    "whatYoullLearn": {
+      "title": "Ce que vous allez apprendre",
+      "coreConcepts": "Concepts de Base",
+      "advancedPatterns": "Patterns Avancés",
+      "coreList": {
+        "item1": "Fondamentaux de l'App Router et conventions de fichiers",
+        "item2": "Architecture des composants Serveur et Client",
+        "item3": "Récupération de données et streaming",
+        "item4": "Error boundaries et états de chargement"
+      },
+      "advancedList": {
+        "item1": "Validation de formulaires avec les schémas Zod",
+        "item2": "Gestion d'état global avec Zustand",
+        "item3": "État serveur avec TanStack Query",
+        "item4": "Tableaux avancés avec TanStack Table",
+        "item5": "Notifications toast et feedback utilisateur"
+      }
+    }
+  },
+  "examples": {
+    "blog": {
+      "title": "DevBlog",
+      "subtitle": "Blog de Développement",
+      "searchPlaceholder": "Rechercher des articles...",
+      "latestPosts": "Derniers Articles",
+      "featuredPost": "Article à la une",
+      "allPosts": "Tous les Articles",
+      "categories": {
+        "all": "Tous",
+        "development": "Développement",
+        "performance": "Performance",
+        "stateManagement": "State Management",
+        "forms": "Formulaires"
+      },
+      "footer": {
+        "categories": "Catégories",
+        "resources": "Ressources",
+        "contact": "Contact",
+        "tutorials": "Tutoriels",
+        "documentation": "Documentation",
+        "copyright": "Tous droits réservés. Créé avec amour pour la communauté dev."
+      }
+    }
+  }
+}
