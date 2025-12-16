@@ -65,15 +65,16 @@ const serverSearchApi = {
 export default async function SSRSearchPage({
   searchParams,
 }: {
-  searchParams: { q?: string; category?: string; status?: string };
+  searchParams: Promise<{ q?: string; category?: string; status?: string }>;
 }) {
   const queryClient = new QueryClient();
+  const { q, category, status } = await searchParams;
 
   // Extraire les paramètres de recherche de l'URL
   const filters: SearchFilters = {
-    query: searchParams.q || '',
-    category: searchParams.category || '',
-    status: searchParams.status || ''
+    query: q || '',
+    category: category || '',
+    status: status || ''
   };
 
   // Précharger les données côté serveur
