@@ -1415,7 +1415,7 @@ function PaymentForm() {
 
         <TabsContent value="advanced" className="space-y-6">
           {/* Header */}
-          <Card className="bg-gradient-to-r from-orange-500/10 to-amber-500/10 border-orange-200 dark:border-orange-800">
+          <Card className="bg-linear-to-r from-orange-500/10 to-amber-500/10 border-orange-200 dark:border-orange-800">
             <CardHeader>
               <CardTitle className="text-2xl">{t('advanced.title')}</CardTitle>
               <CardDescription className="text-base">
