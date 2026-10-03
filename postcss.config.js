@@ -1,11 +1,5 @@
-import { createRequire } from 'module';
-
-const require = createRequire(import.meta.url);
-
-export default {
+module.exports = {
   plugins: {
-    tailwindcss: {},
-    autoprefixer: {},
+    '@tailwindcss/postcss': {},
   },
 };
-
